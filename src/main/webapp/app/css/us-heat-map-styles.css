@@ -1,0 +1,13 @@
+svg.us-heat-map  .state {
+  stroke: #fff;
+  stroke-linejoin: round;
+  cursor : pointer;
+}
+
+svg.us-heat-map  .grpahz-legend text{
+    font-size : 14px;
+}
+
+svg.us-heat-map  .state:hover{
+    fill-opacity: 0.8;
+}
