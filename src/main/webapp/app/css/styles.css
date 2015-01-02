@@ -21,3 +21,13 @@ input[type="range"]{
     width  : 500px;
     margin : 0 auto;
 }
+button#play-btn {
+	width: 100px;
+	margin: 0 auto;
+	display: block;
+	font-size: 1.2em;
+	font-weight: bold;
+	background: #f4f4f4;
+	border: 1px solid #939393;
+	border-radius: 5px;
+}

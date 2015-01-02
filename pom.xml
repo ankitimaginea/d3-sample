@@ -46,6 +46,9 @@
 				<configuration>
 					<contextPath>/</contextPath>
 					<scanIntervalSeconds>10</scanIntervalSeconds>
+					<connector implementation="org.mortbay.jetty.bio.SocketConnector">
+						<port>8080</port>
+					</connector>
 				</configuration>
 			</plugin>
 		</plugins>

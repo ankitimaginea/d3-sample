@@ -1,13 +1,40 @@
-svg.us-heat-map  .state {
-  stroke: #fff;
+div.us-heat-map  .state {
+  stroke: #000;
   stroke-linejoin: round;
   cursor : pointer;
 }
 
-svg.us-heat-map  .grpahz-legend text{
+div.us-heat-map  .grpahz-legend text{
     font-size : 14px;
 }
 
-svg.us-heat-map  .state:hover{
-    fill-opacity: 0.8;
+div.us-heat-map  .state:hover{
+    stroke: #bbb;
+}
+
+div.us-heat-map div.us-heat-map-hover {
+	background: #FFFFFF;
+	position: absolute;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	display:none;
+}
+div.us-heat-map div.us-heat-map-hover span.state-code{
+	display:block;
+	font-size: 1.2em;
+	color: #aaa;
+	text-align: center;
+	text-transform: capitalize;
+	background : #333;
+	padding: 5px;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+}
+div.us-heat-map div.us-heat-map-hover span.state-value{
+	display:block;
+	font-size: 1.4em;
+	font-weight: bold;
+	color: #333;
+	text-align: center;
+	padding : 5px;	
 }

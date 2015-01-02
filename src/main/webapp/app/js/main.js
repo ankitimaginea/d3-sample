@@ -22,14 +22,42 @@ var GRAPHZ =  GRAPHZ || {};
             heatMap = new GRAPHZ.USHeatMap('graph-container'),
             dataGenerator = GRAPHZ.USHeatMapDataGenerator,
             minHr = 8,
-            maxHr = 20;
+            maxHr = 20,
+            dataSetToRender,
+            value = minHr;
+        	play = false,
+        	animator = undefined;
         d3.json(proxyDataURL, function(error, dataSet){
-        	dataSet = transform(dataSet);
-            var slider = d3.slider().axis(true).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
+        	dataSetToRender = transform(dataSet);
+        	renderSlider(dataSetToRender, minHr, minHr, maxHr);
+        });
+        function renderSlider(dataSet, value){
+        	var sliderContainer = d3.select('#slider');
+        	var slider = d3.slider().axis(true).value(value).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
                 heatMap.render(dataSet[value - minHr]);
+                value = value;
             });
-            d3.select('#slider').call(slider);
-            heatMap.render(dataSet[0]);
+        	sliderContainer.selectAll("*").remove();
+        	sliderContainer.call(slider);
+            heatMap.render(dataSet[value - minHr]);
+        }
+        d3.select('#play-btn').on('click', function(){
+        	if(animator){
+        		window.clearInterval(animator);
+        		animator = undefined;
+        		this.innerText = 'Play';
+        	} else{
+        		animator = window.setInterval(function(){
+	            	if(value == maxHr){
+	            		value = minHr;
+	            	} else {
+	            		value++;
+	            	}
+	            	renderSlider(dataSetToRender, value);
+	            	return play;
+	            }, 500);
+        		this.innerText = 'Stop';
+        	}
         });
     };
     var stateCodeMap = {"alabama":"AL",
