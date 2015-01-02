@@ -23,7 +23,7 @@ input[type="range"]{
 }
 button#play-btn {
 	width: 100px;
-	margin: 0 auto;
+	margin: 10px auto;
 	display: block;
 	font-size: 1.2em;
 	font-weight: bold;
