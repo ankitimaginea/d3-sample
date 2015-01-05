@@ -1,0 +1,130 @@
+/*global d3, GRAPHZ, topojson*/
+(function () {
+    var defaults = {
+        'width': '960',
+        'height': '500',
+        'scale': 1000
+    };
+    var getLegends = function (scale) {
+        var legends = [],
+            red = 0,
+            green = 255,
+            blue = 0,
+            range = (green - 100),
+            step = Math.ceil(range / scale.length);
+        for (var i = 0, j = 0; i < range; i += step) {
+            legends.push({
+                'range': scale[j].range,
+                'label': scale[j].label,
+                'color': 'rgb(' + [red, green - i, blue].join(',') + ')'
+            });
+            j++;
+        }
+        return legends;
+    };
+    var stateNames = {"AL":"alabama","AK":"alaska","AS":"american samoa","AZ":"arizona","AR":"arkansas","CA":"california","CO":"colorado","CT":"connecticut","DE":"delaware","DC":"dist. of columbia","FL":"florida","GA":"georgia","GU":"guam","HI":"hawaii","ID":"idaho","IL":"illinois","IN":"indiana","IA":"iowa","KS":"kansas","KY":"kentucky","LA":"louisiana","ME":"maine","MD":"maryland","MH":"marshall islands","MA":"massachusetts","MI":"michigan","FM":"micronesia","MN":"minnesota","MS":"mississippi","MO":"missouri","MT":"montana","NE":"nebraska","NV":"nevada","NH":"new hampshire","NJ":"new jersey","NM":"new mexico","NY":"new york","NC":"north carolina","ND":"north dakota","MP":"northern marianas","OH":"ohio","OK":"oklahoma","OR":"oregon","PW":"palau","PA":"pennsylvania","PR":"puerto rico","RI":"rhode island","SC":"south carolina","SD":"south dakota","TN":"tennessee","TX":"texas","UT":"utah","VT":"vermont","VA":"virginia","VI":"virgin islands","WA":"washington","WV":"west virginia","WI":"wisconsin","WY":"wyoming"};
+    var renderLegends = function (legendContainer, legends, legendOffset) {
+        legendContainer.attr('class', 'grpahz-legends');
+        for (var i = 0, len = legends.length; i < len; i++) {
+            var legendGroup = legendContainer.append('g');
+            legendGroup.attr('class', 'grpahz-legend');
+            legendGroup.append('rect')
+                .attr('x', legendOffset[0])
+                .attr('y', legendOffset[1] + i * 20)
+                .attr('width', 10)
+                .attr('height', 10)
+                .style('fill', legends[i].color);
+            legendGroup.append('text')
+                .attr('x', legendOffset[0] + 20)
+                .attr('y', legendOffset[1] + 10 + i * 20)
+                .text(legends[i].label);
+        }
+    };
+    var renderData = function (usMapInfo, data, legendOffset) {
+        var self = this,
+            legends = getLegends(data.scale),
+            us = usMapInfo;
+        legendOffset = legendOffset || [800, 400];
+        self.svg.insert("path", ".graticule")
+            .datum(topojson.feature(us, us.objects.land))
+            .attr("class", "land")
+            .attr("d", self.path);
+        self.svg.append("g")
+            .attr("class", "states")
+            .selectAll("path")
+            .data(topojson.feature(us, us.objects.states).features)
+            .enter().append("path")
+            .attr('class', 'state')
+            .style('fill', function (state) {
+                var stateCode = state.properties.code,
+                    value = data.values[stateCode],
+                    scale = data.scale,
+                    range = [];
+                for (var i = 0, len = scale.length; i < len; i++) {
+                    range = scale[i].range;
+                    if (value >= range[0] && value <= range[1]) {
+                        return legends[i].color;
+                    }
+                }
+                return '#ccc';
+            })
+            .on('mouseover', function(state){
+             	var stateCode = state.properties.code,
+             		stateName = stateNames[stateCode],
+                 	value = data.values[stateCode];
+                showStateHoverPopup.call(self, [d3.event.pageX, d3.event.pageY], stateName, value);
+            })
+            .attr("d", self.path);
+        self.svg.on('mouseout', function(){
+        	self.popup.style('display', 'none');
+        });
+        renderLegends(self.svg.append('g'), legends, legendOffset);
+    };
+    var showStateHoverPopup = function(at, state, value){
+    	var self = this;
+    	self.popup
+    		.style('left', at[0])
+    		.style('top', at[1])
+    		.selectAll("*").remove();
+    	self.popup.html(['<span class="state-code">',
+    								state,
+    								'</span>',
+    								'<span class="state-value">',
+    								value,
+    								'</span>'].join(''));
+    	self.popup.style('display', 'block');
+    };
+    GRAPHZ.USHeatMap = function (containerId, options) {
+        options = GRAPHZ.util.extendMap(defaults, options);
+        var width = options.width,
+            height = options.height,
+            projection = d3.geo.albersUsa()
+            .scale(options.scale)
+            .translate([width / 2, height / 2]);
+        this.container = d3.select("#" + containerId).append('div');
+        this.container.classed('us-heat-map', true);
+        this.path = d3.geo.path().projection(projection);
+        this.svg = this.container
+		            .append("svg")
+		            .attr("width", options.width)
+		            .attr("height", height);
+        this.popup = this.container
+    				.append('div')
+    				.classed('us-heat-map-hover', true);
+    };
+    GRAPHZ.USHeatMap.prototype.render = function (data, legendOffset, callback) {
+        this.svg.selectAll('g').remove();
+        var self = this;
+        if (!this.usMapInfo) {
+            d3.json("data/us.state.map.json", function (error, us) {
+                self.usMapInfo = us;
+                self.render(data, legendOffset, callback);
+            });
+        } else {
+            renderData.call(this, this.usMapInfo, data, legendOffset);
+            if (callback) {
+                callback();
+            }
+        }
+    };
+})();

@@ -1,4 +1,3 @@
-paly-with-d3
+d3-sample
 ============
-This is just an experiment with D3.
-Just mvn jetty:run
+Creates a heatmap for click stream data.
