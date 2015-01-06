@@ -13,23 +13,31 @@ var GRAPHZ =  GRAPHZ || {};
         }
         return extendedMap;
     };
-    GRAPHZ.start = function (dataURL) {
-    	var proxyDataURL = '/proxy?targetUri='+encodeURIComponent(dataURL);
+    GRAPHZ.start = function (dataURL, daily) {
+
+    	var proxyDataURL = dataURL;
         var heatMapOptions = {
                 'width': '100%',
                 'height': '100%'
             },
-            heatMap = new GRAPHZ.USHeatMap('graph-container'),
+            heatMap,
             dataGenerator = GRAPHZ.USHeatMapDataGenerator,
-            minHr = 8,
-            maxHr = 20,
+            minHr = 0,
+            maxHr = 23,
             dataSetToRender,
             value = minHr;
         	play = false,
         	animator = undefined;
+        var containerId = "graph-container";
+        d3.select("#" + containerId + " div").remove();
+        heatMap = new GRAPHZ.USHeatMap('graph-container');
         d3.json(proxyDataURL, function(error, dataSet){
-        	dataSetToRender = transform(dataSet);
-        	renderSlider(dataSetToRender, minHr, minHr, maxHr);
+            if (daily) {
+                heatMap.render(aggregate(dataSet));
+            } else {
+        	    dataSetToRender = transform(dataSet);
+        	    renderSlider(dataSetToRender, minHr, minHr, maxHr);
+            }
         });
         function renderSlider(dataSet, value){
         	var sliderContainer = d3.select('#slider');
@@ -119,49 +127,65 @@ var GRAPHZ =  GRAPHZ || {};
     							"west virginia":"WV",
     							"wisconsin":"WI",
     							"wyoming":"WY"};
-    function transform(dataSet){
-    	var transformedDataSet = [];
+
+    function aggregate(dataSet) {
+        var currMax = 0;
+        var transformedDataPoint = {
+            "scale":{},
+            "values": []
+        };
+
+        for(var i = 0; i < dataSet.length; i++){
+            var stateName = dataSet[i][2], stateCode, stateTotal;
+            if (stateName) {
+                stateCode = stateCodeMap[stateName.toLowerCase()];
+                stateTotal = transformedDataPoint.values[stateCode];
+                stateTotal = ((stateTotal)? stateTotal : 0 ) + dataSet[i][0];
+                transformedDataPoint.values[stateCode] = stateTotal;
+            }
+        }
+        for (i in transformedDataPoint.values) {
+            currMax = Math.max(currMax, (transformedDataPoint.values[i] || 0));
+        }
+        transformedDataPoint.scale.max = currMax;
+        return transformedDataPoint;
+    }
+
+    function transform(dataSet) {
+        var aggTimeLine = [];
+        var i = 0;
+        var currValue = null;
+        var currTime = null;
+        for ( ; i < dataSet.length; i++) {
+            // extract on basis of 2nd column
+            currValue = dataSet[i];
+            currTime = parseInt(currValue[1]);
+            aggTimeLine[currTime] = aggTimeLine[currTime] || [];
+            aggTimeLine[currTime].push([currValue[2], currValue[0]]);
+        }
+        return transformForTimeLine(aggTimeLine);
+    }
+
+    function transformForTimeLine(dataSet){
+    	var transformedDataSet = [], currMax = 0, invalidData = [];
     	for(var i = 0, len=dataSet.length; i < len; i++){
     		var dataPoint = dataSet[i];
         	var transformedDataPoint = {
-                    "scale": [{
-                            "label": "",
-                            "range": [1, 100]
-                            }, {
-                            "label": "",
-                            "range": [100, 200]
-                            }, {
-                            "label": "",
-                            "range": [201, 300]
-                            }, {
-                            "label": "",
-                            "range": [301, 400]
-                            }, {
-                            "label": "",
-                            "range": [401, 500]
-                            }, {
-                            "label": "",
-                            "range": [501, 600]
-                            }, {
-                            "label": "",
-                            "range": [601, 700]
-                            }, {
-                            "label": "",
-                            "range": [701, 800]
-                            }, {
-                            "label": "",
-                            "range": [801, 900]
-                            }, {
-                            "label": "",
-                            "range": [901, 1000]
-                            }
-                        ],
-                    "values": []
+                "scale":{},
+                "values": []
                 };
-        	for(var j =0, jLen = dataPoint.length; j < jLen; j++){
-        		var stateCode = stateCodeMap[dataPoint[j][1].toLowerCase()];
-        		transformedDataPoint.values[stateCode] = dataPoint[j][0]
+        	for(var j = 0, jLen = dataPoint.length; j < jLen; j++) {
+                var stateName = dataPoint[j][0];
+                // there are null state names, so silently drop them
+                if (stateName) {
+        		    var stateCode = stateCodeMap[stateName.toLowerCase()];
+        		    transformedDataPoint.values[stateCode] = dataPoint[j][1];
+                    currMax = Math.max(currMax, dataPoint[j][1]);
+                } else {
+                    invalidData.push(dataPoint[j]);
+                }
         	}
+            transformedDataPoint.scale.max = (currMax + 1);
         	transformedDataSet.push(transformedDataPoint);
     	}
     	return transformedDataSet;

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -9,26 +10,54 @@
 
 <body>
 
-    <nav>
-        <!--<input type="text" name="date">-->
-    </nav>
-    <div class="">
+    <div>
+      <select name="view" id="countView" onchange="return toggleView(event)">
+        <option id="dailyCount" selected="true">Daily Count</option>
+        <option id="hourlyCount">Hourly Count</option>
+      </select>
+      <div id="hourlyCountView" style="display:none">
         <button id="play-btn">Play</button>
         <div id="slider">
         </div>
-        <div id="graph-container">
-        </div>
+      </div>
+      <div id="graph-container">
+      </div>
     </div>
     <script src="./lib/d3.min.js"></script>
     <script src="./lib/d3.slider.js"></script>
     <script src="./lib/topojson.v1.min.js"></script>
-    <script src="./app/js/main.js" type="text/javascript"></script>
-    <script src="./app/js/us-heat-map.js" type="text/javascript"></script>
-    <script src="./data/generated-data.js"></script>
+    <script src="./app/js/main.js" ></script>
+    <script src="./app/js/us-heat-map.js"></script>
     <script>
-    	window.onload = function(){
-    		GRAPHZ.start('./data/sample.data.json');
-    	};
+    function toggleView(event) {
+        var select = document.getElementById('countView');
+        var view = select.options[select.selectedIndex].id;
+        if (view === 'dailyCount') {
+            renderCount(true);
+        } else {
+            renderCount(false);
+        }
+    }
+    
+    window.onload = function(){
+    		renderCount(true);
+    };
+
+    function renderCount(daily) {
+        if (daily) {
+            // toggleNode(document.getElementById('dailyCountView'), true);
+            toggleNode(document.getElementById('hourlyCountView'), false);
+            GRAPHZ.start('./data/st.data.json', true);
+        } else {
+            // toggleNode(document.getElementById('dailyCountView'), false);
+            toggleNode(document.getElementById('hourlyCountView'), true);
+            GRAPHZ.start('./data/st.data.json');
+        }
+    }
+
+    function toggleNode(node, display) {
+        node.style.display = (display)? 'block':'none';
+    }
     </script>
 </body>
 

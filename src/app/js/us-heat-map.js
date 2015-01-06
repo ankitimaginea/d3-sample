@@ -1,26 +1,19 @@
 /*global d3, GRAPHZ, topojson*/
 (function () {
+    var options;
     var defaults = {
         'width': '960',
         'height': '500',
         'scale': 1000
     };
     var getLegends = function (scale) {
-        var legends = [],
-            red = 0,
-            green = 255,
-            blue = 0,
-            range = (green - 100),
-            step = Math.ceil(range / scale.length);
-        for (var i = 0, j = 0; i < range; i += step) {
-            legends.push({
-                'range': scale[j].range,
-                'label': scale[j].label,
-                'color': 'rgb(' + [red, green - i, blue].join(',') + ')'
-            });
-            j++;
-        }
-        return legends;
+        // var legends = [],
+        //     red = 0,
+        //     green = 255,
+        //     blue = 0,
+        //     range = (green - 100),
+        //     step = Math.ceil(range / scale.length);
+        return [];
     };
     var stateNames = {"AL":"alabama","AK":"alaska","AS":"american samoa","AZ":"arizona","AR":"arkansas","CA":"california","CO":"colorado","CT":"connecticut","DE":"delaware","DC":"dist. of columbia","FL":"florida","GA":"georgia","GU":"guam","HI":"hawaii","ID":"idaho","IL":"illinois","IN":"indiana","IA":"iowa","KS":"kansas","KY":"kentucky","LA":"louisiana","ME":"maine","MD":"maryland","MH":"marshall islands","MA":"massachusetts","MI":"michigan","FM":"micronesia","MN":"minnesota","MS":"mississippi","MO":"missouri","MT":"montana","NE":"nebraska","NV":"nevada","NH":"new hampshire","NJ":"new jersey","NM":"new mexico","NY":"new york","NC":"north carolina","ND":"north dakota","MP":"northern marianas","OH":"ohio","OK":"oklahoma","OR":"oregon","PW":"palau","PA":"pennsylvania","PR":"puerto rico","RI":"rhode island","SC":"south carolina","SD":"south dakota","TN":"tennessee","TX":"texas","UT":"utah","VT":"vermont","VA":"virginia","VI":"virgin islands","WA":"washington","WV":"west virginia","WI":"wisconsin","WY":"wyoming"};
     var renderLegends = function (legendContainer, legends, legendOffset) {
@@ -57,16 +50,9 @@
             .attr('class', 'state')
             .style('fill', function (state) {
                 var stateCode = state.properties.code,
-                    value = data.values[stateCode],
-                    scale = data.scale,
-                    range = [];
-                for (var i = 0, len = scale.length; i < len; i++) {
-                    range = scale[i].range;
-                    if (value >= range[0] && value <= range[1]) {
-                        return legends[i].color;
-                    }
-                }
-                return '#ccc';
+                    value = data.values[stateCode], 
+                    scale = data.scale;
+                return 'rgb(0,'+(255 - Math.ceil(value/scale.max * 255))+',0)';
             })
             .on('mouseover', function(state){
              	var stateCode = state.properties.code,
@@ -83,24 +69,26 @@
     var showStateHoverPopup = function(at, state, value){
     	var self = this;
     	self.popup
-    		.style('left', at[0])
-    		.style('top', at[1])
+    		.style('left', at[0] + "px")
+    		.style('top', at[1] + "px")
     		.selectAll("*").remove();
+
     	self.popup.html(['<span class="state-code">',
     								state,
     								'</span>',
     								'<span class="state-value">',
     								value,
     								'</span>'].join(''));
-    	self.popup.style('display', 'block');
+        self.popup.style('display', 'block');
     };
-    GRAPHZ.USHeatMap = function (containerId, options) {
-        options = GRAPHZ.util.extendMap(defaults, options);
+    GRAPHZ.USHeatMap = function (containerId, pOptions) {
+        options = GRAPHZ.util.extendMap(defaults, pOptions);
         var width = options.width,
             height = options.height,
             projection = d3.geo.albersUsa()
             .scale(options.scale)
             .translate([width / 2, height / 2]);
+        this.containerId = containerId;
         this.container = d3.select("#" + containerId).append('div');
         this.container.classed('us-heat-map', true);
         this.path = d3.geo.path().projection(projection);
@@ -113,6 +101,7 @@
     				.classed('us-heat-map-hover', true);
     };
     GRAPHZ.USHeatMap.prototype.render = function (data, legendOffset, callback) {
+        var containerId = this.containerId;
         this.svg.selectAll('g').remove();
         var self = this;
         if (!this.usMapInfo) {
