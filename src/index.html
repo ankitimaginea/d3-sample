@@ -30,7 +30,7 @@
     <script src="./lib/topojson.v1.min.js"></script>
     <script src="./app/js/main.js" ></script>
     <script src="./app/js/us-heat-map.js"></script>
-    <script src="./data/st.data.json"></script>
+    <script src="./data/st.data.js"></script>
     <script>
     function toggleView(event) {
         var select = document.getElementById('countView');
@@ -50,11 +50,11 @@
         if (daily) {
             // toggleNode(document.getElementById('dailyCountView'), true);
             toggleNode(document.getElementById('hourlyCountView'), false);
-            GRAPHZ.start('./data/st.data.json', true);
+            GRAPHZ.start('does-not-matter', true);
         } else {
             // toggleNode(document.getElementById('dailyCountView'), false);
             toggleNode(document.getElementById('hourlyCountView'), true);
-            GRAPHZ.start('./data/st.data.json');
+            GRAPHZ.start('does-not-matter');
         }
     }
 
