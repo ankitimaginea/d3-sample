@@ -14,7 +14,7 @@ var GRAPHZ =  GRAPHZ || {};
         return extendedMap;
     };
     GRAPHZ.start = function (dataURL, daily) {
-
+        var dataSet = clickData;
     	var proxyDataURL = dataURL;
         var heatMapOptions = {
                 'width': '100%',
@@ -31,14 +31,7 @@ var GRAPHZ =  GRAPHZ || {};
         var containerId = "graph-container";
         d3.select("#" + containerId + " div").remove();
         heatMap = new GRAPHZ.USHeatMap('graph-container');
-        d3.json(proxyDataURL, function(error, dataSet){
-            if (daily) {
-                heatMap.render(aggregate(dataSet));
-            } else {
-        	    dataSetToRender = transform(dataSet);
-        	    renderSlider(dataSetToRender, minHr, minHr, maxHr);
-            }
-        });
+
         function renderSlider(dataSet, value){
         	var sliderContainer = d3.select('#slider');
         	var slider = d3.slider().axis(true).value(value).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
@@ -49,6 +42,7 @@ var GRAPHZ =  GRAPHZ || {};
         	sliderContainer.call(slider);
             heatMap.render(dataSet[value - minHr]);
         }
+
         d3.select('#play-btn').on('click', function(){
         	if(animator){
         		window.clearInterval(animator);
@@ -67,6 +61,14 @@ var GRAPHZ =  GRAPHZ || {};
         		this.innerText = 'Stop';
         	}
         });
+
+        if (daily) {
+            heatMap.render(aggregate(dataSet));
+        } else {
+        	dataSetToRender = transform(dataSet);
+        	renderSlider(dataSetToRender, minHr, minHr, maxHr);
+        }
+
     };
     var stateCodeMap = {"alabama":"AL",
     							"alaska":"AK",

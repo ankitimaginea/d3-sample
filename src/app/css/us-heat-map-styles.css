@@ -1,3 +1,7 @@
+.d3-slider-axis text {
+    stroke : white;
+}
+
 div.us-heat-map  .state {
   stroke: #000;
   stroke-linejoin: round;

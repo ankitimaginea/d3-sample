@@ -5,16 +5,18 @@
     <link rel="stylesheet" href="./app/css/us-heat-map-styles.css">
     <link rel="stylesheet" href="./lib/d3.slider.css">
     <link rel="stylesheet" href="./app/css/styles.css">
-    <title>HEAT MAP</title>
+    <title>Click Stream Report</title>
 </head>
 
 <body>
-
-    <div>
-      <select name="view" id="countView" onchange="return toggleView(event)">
-        <option id="dailyCount" selected="true">Daily Count</option>
+    <div id="header"> 
+    <select name="view" id="countView" onchange="return toggleView(event)">
+        <option id="dailyCount" selected="true">Total Count</option>
         <option id="hourlyCount">Hourly Count</option>
       </select>
+    &nbsp; of Hits per state for Nov and Dec 2014
+    </div>
+    <div>
       <div id="hourlyCountView" style="display:none">
         <button id="play-btn">Play</button>
         <div id="slider">
@@ -28,6 +30,7 @@
     <script src="./lib/topojson.v1.min.js"></script>
     <script src="./app/js/main.js" ></script>
     <script src="./app/js/us-heat-map.js"></script>
+    <script src="./data/st.data.json"></script>
     <script>
     function toggleView(event) {
         var select = document.getElementById('countView');
