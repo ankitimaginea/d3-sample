@@ -1,5 +1,8 @@
 /* global window*/
-var GRAPHZ =  GRAPHZ || {};
+var GRAPHZ =  GRAPHZ || {},
+    changeDuration = undefined,
+    bgColor = ['000000','202020','404040', '606060', '808080','a0a0a0', 'c0c0c0', 'eoeoeo', 'ffffff', 'ffffcc', 'ffff99', 'ffff66','ffff33', 'ffff00', '99ccff', '66b2ff', '004c99', '003366', 'a0a0a0', '808080', '606060', '404040', '202020', '000000'];
+
 (function(){
     GRAPHZ.util = {};
     GRAPHZ.util.extendMap = function(map1, map2){
@@ -26,8 +29,7 @@ var GRAPHZ =  GRAPHZ || {};
             maxHr = 23,
             dataSetToRender,
             value = minHr;
-        	play = false,
-        	animator = undefined;
+          	play = false;
         var containerId = "graph-container";
         d3.select("#" + containerId + " div").remove();
         heatMap = new GRAPHZ.USHeatMap('graph-container');
@@ -45,24 +47,57 @@ var GRAPHZ =  GRAPHZ || {};
             heatMap.render(dataSet[value - minHr]);
         }
 
+        function renderHourlyMap(dataSet, value){
+          heatMap.render(dataSet[value - minHr]);
+          d3.select('#hourly-count-view')[0][0].selectedIndex = value;
+          //d3.select('#main-content').style({'background': "url('./data/photo-" + Math.floor(value/3) + '.jpeg' + "') no-repeat", 'background-size': 'cover'}).transition().delay(500);
+          $('body').animate({backgroundColor: '#' + bgColor[value]});
+       }
+
         d3.select('#play-btn').on('click', function(){
-        	if(animator){
-        		window.clearInterval(animator);
-        		animator = undefined;
-        		this.innerText = 'Play';
+        	if(changeDuration){
+        		window.clearInterval(changeDuration);
+        		changeDuration = undefined;
+        		this.textContent = 'Play';
         	} else{
-        		animator = window.setInterval(function(){
+            this.textContent = 'Stop';
+        		changeDuration = window.setInterval(function(){
 	            	if(value == maxHr){
 	            		value = minHr;
 	            	} else {
 	            		value++;
 	            	}
-	            	renderSlider(dataSetToRender, value);
+                renderHourlyMap(dataSetToRender, value);
 	            	return play;
-	            }, 500);
-        		this.innerText = 'Stop';
+	            }, 1000);
+
         	}
         });
+
+        d3.select('#prev-btn').on('click', function(){
+          var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
+          if (currentHour == 0) {
+            currentHour = 24;
+          }
+
+          d3.select('#hourly-count-view')[0][0].selectedIndex == --currentHour;
+
+          renderHourlyMap(dataSetToRender, currentHour);
+        });
+
+        d3.select('#next-btn').on('click', function(){
+          var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
+
+          if (currentHour == 23) {
+            currentHour = -1;
+          }
+          d3.select('#hourly-count-view')[0][0].selectedIndex == ++currentHour;
+          renderHourlyMap(dataSetToRender, currentHour);
+        });
+
+        d3.select('#hourly-count-view').on('change', function(){
+          renderHourlyMap(dataSetToRender, parseInt(this.options[this.selectedIndex].text));
+        })
 
         if (daily) {
             heatMap.render(aggregate(dataSet));
