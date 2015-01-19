@@ -49,9 +49,10 @@ var GRAPHZ =  GRAPHZ || {},
 
         function renderHourlyMap(dataSet, value){
           heatMap.render(dataSet[value - minHr]);
+          update_state_list(dataSet[value - minHr].values)
           d3.select('#hourly-count-view')[0][0].selectedIndex = value;
           //d3.select('#main-content').style({'background': "url('./data/photo-" + Math.floor(value/3) + '.jpeg' + "') no-repeat", 'background-size': 'cover'}).transition().delay(500);
-          $('body').animate({backgroundColor: '#' + bgColor[value]});
+          $('.inner').animate({backgroundColor: '#' + bgColor[value]});
        }
 
         d3.select('#play-btn').on('click', function(){
