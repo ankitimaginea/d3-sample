@@ -1,8 +1,24 @@
 /*global d3, GRAPHZ, topojson*/
 (function () {
+    var generate_pallette =  function(){
+        var pallete_arr = [
+        [255,255,204],
+        [255,237,160],
+        [254,217,118],
+        [254,178,76],
+        [253,141,60],
+        [252,78,42],
+        [227,26,28],
+        [189,0,38],
+        [128,0,38]
+        ]
+        return pallete_arr
+
+    }
+    var color_pallette = generate_pallette()
     var options;
     var defaults = {
-        'width': '960',
+        'width': '850',
         'height': '500',
         'scale': 1000
     };
@@ -51,8 +67,9 @@
             .style('fill', function (state) {
                 var stateCode = state.properties.code,
                     value = data.values[stateCode], 
-                    scale = data.scale;
-                return 'rgb(0,'+(255 - Math.ceil(value/scale.max * 255))+',0)';
+                    scale = data.scale
+                return 'rgb('+get_rgb(value, 0, scale.max)+')';
+                // return 'rgb(255,'+(255 - Math.ceil(value/scale.max * 255))+',0)';
             })
             .on('mouseover', function(state){
              	var stateCode = state.properties.code,
@@ -66,6 +83,18 @@
         });
         renderLegends(self.svg.append('g'), legends, legendOffset);
     };
+    var get_rgb = function(value, min, max){
+        if(value == undefined){
+            return '0,0,0'
+        }
+        var ratio = (Math.log(value)/Math.log(max-min))*9
+        var index = Math.max(0, Math.floor(ratio)-1)
+        if(value==max){
+            console.log(color_pallette[index])
+        }
+        return color_pallette[index].join()
+    }
+
     var showStateHoverPopup = function(at, state, value){
     	var self = this;
     	self.popup

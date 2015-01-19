@@ -2,11 +2,15 @@ body {
     background : #171b23;
     margin: 0 auto;
 }
+#header, #count-view {
+  color: black;
+}
+
 #header {
-    background : #253036;
-    padding: 1.3em 1.3em;
-    overflow : hidden;
-    color:#999;
+  background : lightgrey;
+  padding: 1.3em 1.3em;
+  overflow : hidden;
+  opacity: 0.6;
 }
 
 #slider{
@@ -32,12 +36,16 @@ input[type="range"]{
     width  : 500px;
     margin : 0 auto;
 }
-button#play-btn {
-	width: 100px;
+
+#hourly-count-view {
+  display: inline-block;
+  margin-left: 40%;
+}
+
+button {
 	margin: 10px auto;
-	display: block;
-	font-size: 1.2em;
 	font-weight: bold;
+  font-size: 1.1em;
 	background: #f4f4f4;
 	border: 1px solid #939393;
 	border-radius: 5px;
