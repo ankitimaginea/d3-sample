@@ -38,7 +38,8 @@ button#play-btn {
 	display: block;
 	font-size: 1.2em;
 	font-weight: bold;
-	background: #f4f4f4;
-	border: 1px solid #939393;
 	border-radius: 5px;
+    background: #5cb85c;
+    border: 1px solid #4cae4c;
+    color: #fff;
 }

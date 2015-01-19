@@ -36,10 +36,12 @@ var GRAPHZ =  GRAPHZ || {};
         	var sliderContainer = d3.select('#slider');
         	var slider = d3.slider().axis(true).value(value).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
                 heatMap.render(dataSet[value - minHr]);
+                update_state_list(dataSet[value - minHr].values)
                 value = value;
             });
         	sliderContainer.selectAll("*").remove();
         	sliderContainer.call(slider);
+            update_state_list(dataSet[value - minHr].values)
             heatMap.render(dataSet[value - minHr]);
         }
 
@@ -70,6 +72,22 @@ var GRAPHZ =  GRAPHZ || {};
         }
 
     };
+
+    $('#toggle-btn').on('click', function(){
+        // this code can be written better
+        $('#state-data').toggle()
+        if($('#state-data').is(":visible")){
+            $('#content').animate({
+                width: '65.3%'
+            }, 300 )
+        }else{
+            $('#content').animate({
+                width: "82.5%"
+            }, 300 );
+        }
+        
+    })
+
     var stateCodeMap = {"alabama":"AL",
     							"alaska":"AK",
     							"american samoa":"AS",
@@ -130,6 +148,20 @@ var GRAPHZ =  GRAPHZ || {};
     							"wisconsin":"WI",
     							"wyoming":"WY"};
 
+    function get_reverse_code(data_map){
+        var rev_data_map = {}
+        var state_list = []
+        for(var i in data_map){
+            rev_data_map[data_map[i]] = i
+            state_list.push(data_map[i])
+        }
+        return [rev_data_map, state_list]
+
+    }
+    var processed_data = get_reverse_code(stateCodeMap)
+    var reverse_stateCodeMap = processed_data[0] 
+    var state_list = processed_data[1] 
+
     function aggregate(dataSet) {
         var currMax = 0;
         var transformedDataPoint = {
@@ -150,6 +182,7 @@ var GRAPHZ =  GRAPHZ || {};
             currMax = Math.max(currMax, (transformedDataPoint.values[i] || 0));
         }
         transformedDataPoint.scale.max = currMax;
+        update_state_list(transformedDataPoint.values)
         return transformedDataPoint;
     }
 
@@ -191,5 +224,36 @@ var GRAPHZ =  GRAPHZ || {};
         	transformedDataSet.push(transformedDataPoint);
     	}
     	return transformedDataSet;
+    }
+
+    function k_format(number){
+        var k_number = parseInt(number)
+        k_number = Math.ceil(k_number/1000)
+        return k_number + 'k'
+    }
+
+    function update_state_list(data){
+        $('#state-data').empty()
+        // var table = $('#state-data').append($(table))
+        var html = '<table>';
+        for(var i in state_list){ 
+            // $('#state-data').append($('<li/>', {    //here appending `<li>`
+            //     'data-role': "list-divider"
+            // }).append($('<p/>', {    //here appending `<a>` into `<li>`
+            //     'class' : "text-primary",
+            //     'text': reverse_stateCodeMap[i] +", "+ data[i] + " visits"
+            // })));
+            var key = state_list[i]
+            if( key in data){
+                html += '<tr><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
+            }
+            
+        }
+
+        $('#state-data').append(html)
+        
+
+        // $('#state-data').listview('refresh');
+
     }
 })(window);
