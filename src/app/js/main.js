@@ -110,17 +110,19 @@ var GRAPHZ =  GRAPHZ || {},
 
     };
 
-    $('#menu').on('click', function(e){
+    $('#toggle-btn').on('click', function(){
         // this code can be written better
-        $('#state-data').toggle()
+        
         if($('#state-data').is(":visible")){
+            $('#state-data').hide();
             $('#content').animate({
-                width: '65.3%'
+                width: '100%'
             }, 300 )
         }else{
             $('#content').animate({
-                width: "82.5%"
-            }, 300 );
+                width: "80%"
+            }, 100 );
+$('#state-data').show(500);
         }
         
     })
@@ -272,7 +274,7 @@ var GRAPHZ =  GRAPHZ || {},
     function update_state_list(data){
         $('#state-data').empty()
         // var table = $('#state-data').append($(table))
-        var html = '<table>';
+        var html = '', total=0;
         for(var i in state_list){ 
             // $('#state-data').append($('<li/>', {    //here appending `<li>`
             //     'data-role': "list-divider"
@@ -281,13 +283,15 @@ var GRAPHZ =  GRAPHZ || {},
             //     'text': reverse_stateCodeMap[i] +", "+ data[i] + " visits"
             // })));
             var key = state_list[i]
+            console.log(data);
             if( key in data){
                 html += '<tr><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
-            }
+                total+= data[key];
+            }          
             
         }
 
-        $('#state-data').append(html)
+        $('#state-data').append('<table><tr><td> Total: </td>' + '<td>' + k_format(total) + '</td></tr>' + html + '</html>');
         
 
         // $('#state-data').listview('refresh');

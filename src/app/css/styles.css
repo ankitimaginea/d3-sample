@@ -50,3 +50,12 @@ button {
 	border: 1px solid #939393;
 	border-radius: 5px;
 }
+
+
+#state-data table {
+  width: 220px;
+}
+
+#state-data table tr {
+  border-bottom: 1px solid #000;
+}
