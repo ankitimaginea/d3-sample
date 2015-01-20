@@ -16,6 +16,18 @@ var GRAPHZ =  GRAPHZ || {},
         }
         return extendedMap;
     };
+    GRAPHZ.util.refreshClock = function(value){
+        if(value>=0 && value<=12){
+            $('.am').addClass('active')
+            $('.pm').removeClass('active')
+        }else{
+            $('.am').removeClass('active')
+            $('.pm').addClass('active')
+        }
+        clock.refreshDisplay(value)
+
+   }
+
     GRAPHZ.start = function (dataURL, daily) {
         var dataSet = clickData;
     	var proxyDataURL = dataURL;
@@ -50,12 +62,13 @@ var GRAPHZ =  GRAPHZ || {},
         function renderHourlyMap(dataSet, value){
           heatMap.render(dataSet[value - minHr]);
           update_state_list(dataSet[value - minHr].values)
-          clock.refreshDisplay(value)
+          GRAPHZ.util.refreshClock(value)
           d3.select('#hourly-count-view')[0][0].selectedIndex = value;
           //d3.select('#main-content').style({'background': "url('./data/photo-" + Math.floor(value/3) + '.jpeg' + "') no-repeat", 'background-size': 'cover'}).transition().delay(500);
           // $('.inner').animate({backgroundColor: '#' + bgColor[value]});
        }
 
+        
         d3.select('#play-btn').on('click', function(){
         	if(changeDuration){
         		window.clearInterval(changeDuration);
@@ -283,7 +296,6 @@ $('#state-data').show(500);
             //     'text': reverse_stateCodeMap[i] +", "+ data[i] + " visits"
             // })));
             var key = state_list[i]
-            console.log(data);
             if( key in data){
                 html += '<tr><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
                 total+= data[key];

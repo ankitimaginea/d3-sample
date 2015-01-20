@@ -102,9 +102,6 @@
         }
         var ratio = (Math.log(value)/Math.log(max-min))*9
         var index = Math.max(0, Math.floor(ratio)-1)
-        if(value==max){
-            console.log(color_pallette[index])
-        }
         return color_pallette[index].join()
     }
 

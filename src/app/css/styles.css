@@ -59,3 +59,24 @@ button {
 #state-data table tr {
   border-bottom: 1px solid #000;
 }
+
+#am-pm ul{
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  margin-top: -180px;
+  position: absolute;
+  margin-left: 52px;
+}
+#am-pm ul li{
+  display: inline;
+  padding: 2px 5px;
+  background-color: #655;
+  color: #522;
+}
+.am{border-radius: 5px 0 0 5px;}
+.pm{border-radius: 0 5px 5px 0;}
+#am-pm ul li.active{
+  background-color: #fb3c2d;
+  color: #fff;
+}
