@@ -128,14 +128,13 @@ var GRAPHZ =  GRAPHZ || {},
         
         if($('#state-data').is(":visible")){
             $('#state-data').hide();
+            $('#content').removeClass('wd-220-diff')
             $('#content').animate({
                 width: '100%'
             }, 300 )
         }else{
-            $('#content').animate({
-                width: "80%"
-            }, 100 );
-$('#state-data').show(500);
+            $('#content').addClass('wd-220-diff', 300)
+            $('#state-data').show();
         }
         
     })
@@ -297,13 +296,13 @@ $('#state-data').show(500);
             // })));
             var key = state_list[i]
             if( key in data){
-                html += '<tr><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
+                html += '<tr><td style="text-transform: capitalize;">' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
                 total+= data[key];
             }          
             
         }
 
-        $('#state-data').append('<table><tr><td> Total: </td>' + '<td>' + k_format(total) + '</td></tr>' + html + '</html>');
+        $('#state-data').append('<table><tr><td><b> Total: </b></td>' + '<td><b>' + k_format(total) + '</b></td></tr>' + html + '</html>');
         
 
         // $('#state-data').listview('refresh');

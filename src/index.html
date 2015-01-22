@@ -81,8 +81,8 @@
     </div>
 
    
-    <div id="content">
-        <div class="inner" style="min-height: 700px;">
+    <div id="content" class="wd-220-diff">
+        <div class="inner" style="min-height: 700px; background-color:#000;">
              <div id="graph-container">
             </div>
             <div id="hourlyCountView" style="display:none">
@@ -130,7 +130,7 @@
     </div>
 
     <div id="right" style="padding:0">
-        <div id="state-data" style="overflow-y: scroll; height: 670px;margin: 20px 10px 10px 10px;">
+        <div id="state-data" style="overflow-y: scroll;overflow-x: hidden; height: 670px;padding: 20px 15px;">
         </div>
     </div>
 
@@ -154,7 +154,6 @@
         var view = select.options[select.selectedIndex].id;
         if (view === 'dailyCount') {
             // $('.inner').css('background-color', '#000');
-            change_inner_bg('000');
             renderCount(true);
 
             if(changeDuration){
@@ -163,19 +162,14 @@
               $('#play-btn').text('Play');
             }
         } else {
-            change_inner_bg(bgColor[d3.select('#hourly-count-view')[0][0].selectedIndex]);
             GRAPHZ.util.refreshClock(0)
+            $('#hourly-count-view').prop('selectedIndex',0);
             renderCount(false);
         }
     }
-
-    function change_inner_bg(color) {
-      $('.inner').css('background-color', '#' + color);
-    }
     
     window.onload = function(){
-            change_inner_bg('000');
-    		renderCount(true);
+    		    renderCount(true);
     };
 
     function renderCount(daily) {

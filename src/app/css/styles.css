@@ -53,7 +53,7 @@ button {
 
 
 #state-data table {
-  width: 220px;
+  width: 180px;
 }
 
 #state-data table tr {
@@ -80,3 +80,5 @@ button {
   background-color: #fb3c2d;
   color: #fff;
 }
+/*.wd-100{width: '100%'}*/
+.wd-220-diff{width: calc(100% - 220px) !important}
