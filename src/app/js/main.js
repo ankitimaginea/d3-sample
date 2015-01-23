@@ -128,11 +128,18 @@ var GRAPHZ =  GRAPHZ || {},
         
         if($('#state-data').is(":visible")){
             $('#state-data').hide();
+            
+            $('#toggle-btn i').removeClass('icon-arrow-right')
+            $('#toggle-btn i').addClass('icon-arrow-left')
+
             $('#content').removeClass('wd-220-diff')
             $('#content').animate({
                 width: '100%'
             }, 300 )
         }else{
+            $('#toggle-btn i').removeClass('icon-arrow-left')
+            $('#toggle-btn i').addClass('icon-arrow-right')
+
             $('#content').addClass('wd-220-diff', 300)
             $('#state-data').show();
         }
