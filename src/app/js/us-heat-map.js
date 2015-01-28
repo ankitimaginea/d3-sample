@@ -1,20 +1,22 @@
 /*global d3, GRAPHZ, topojson*/
 (function () {
     var generate_pallette =  function(){
-        var pallete_arr = [
-        [255,255,204],
-        [255,237,160],
-        [254,217,118],
-        [254,178,76],
-        [253,141,60],
-        [252,78,42],
-        [227,26,28],
-        [189,0,38],
-        [128,0,38]
-        ]
-        return pallete_arr
 
+        var pallete_arr = [
+            [255,255,229],
+            [247,252,185],
+            [217,240,163],
+            [173,221,142],
+            [120,198,121],
+            [65,171,93],
+            [35,132,67],
+            [0,104,55],
+            [0,69,41]
+        ]
+
+        return pallete_arr
     }
+    
     var color_pallette = generate_pallette()
     var options;
     var defaults = {
@@ -54,9 +56,26 @@
             legends = getLegends(data.scale),
             us = usMapInfo;
         legendOffset = legendOffset || [800, 400];
-        self.svg.insert("path", ".graticule")
+
+    var defs = self.svg.append("defs");
+
+/*
+        // for the shadow effect as detailed in the UI proposal (ppt)
+        // commented it out for now since this needs special handling in the resize logic.
+        // TODO
+        defs.append("filter")
+          .attr("id", "blur")
+          .append("feGaussianBlur")
+          .attr("stdDeviation", 5);
+
+        this.svg.append("use")
+          .attr("class", "land-glow")
+          .attr("xlink:href", "#land");
+*/
+
+        defs.insert("path", ".graticule")
             .datum(topojson.feature(us, us.objects.land))
-            .attr("class", "land")
+            .attr("id", "land")
             .attr("d", self.path);
         self.svg.append("g")
             .attr("class", "states")
@@ -64,6 +83,7 @@
             .data(topojson.feature(us, us.objects.states).features)
             .enter().append("path")
             .attr('class', 'state')
+            .attr("d", self.path)
             .style('fill', function (state) {
                 var stateCode = state.properties.code,
                     value = data.values[stateCode], 
@@ -76,8 +96,7 @@
              		stateName = stateNames[stateCode],
                  	value = data.values[stateCode];
                 showStateHoverPopup.call(self, [d3.event.pageX, d3.event.pageY], stateName, value);
-            })
-            .attr("d", self.path);
+            });
         self.svg.on('mouseout', function(){
         	self.popup.style('display', 'none');
         });
@@ -89,9 +108,6 @@
         }
         var ratio = (Math.log(value)/Math.log(max-min))*9
         var index = Math.max(0, Math.floor(ratio)-1)
-        if(value==max){
-            console.log(color_pallette[index])
-        }
         return color_pallette[index].join()
     }
 
@@ -117,17 +133,22 @@
             projection = d3.geo.albersUsa()
             .scale(options.scale)
             .translate([width / 2, height / 2]);
+            
         this.containerId = containerId;
-        this.container = d3.select("#" + containerId).append('div');
+        this.container = d3.select("#" + containerId);
         this.container.classed('us-heat-map', true);
         this.path = d3.geo.path().projection(projection);
         this.svg = this.container
 		            .append("svg")
-		            .attr("width", options.width)
-		            .attr("height", height);
+                    .style('width', width + 'px')
+                    .style('height', height + 'px')
+		            .attr("viewBox", "0 0 ".concat(width, " ", height));
+		            //.attr("height", options.height);
+        //var viewStr = "0 0 ".concat(width, " ", height);            
+        //this.svg.setAttribute("viewBox", "0 0 0 0");
         this.popup = this.container
     				.append('div')
-    				.classed('us-heat-map-hover', true);
+    				.classed('us-heat-map-hover', true);          
     };
     GRAPHZ.USHeatMap.prototype.render = function (data, legendOffset, callback) {
         var containerId = this.containerId;

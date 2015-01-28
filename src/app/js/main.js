@@ -16,6 +16,7 @@ var GRAPHZ =  GRAPHZ || {},
         }
         return extendedMap;
     };
+
     GRAPHZ.start = function (dataURL, daily) {
         var dataSet = clickData;
     	var proxyDataURL = dataURL;
@@ -31,31 +32,17 @@ var GRAPHZ =  GRAPHZ || {},
             value = minHr;
           	play = false;
         var containerId = "graph-container";
-        d3.select("#" + containerId + " div").remove();
-        heatMap = new GRAPHZ.USHeatMap('graph-container');
 
-        function renderSlider(dataSet, value){
-        	var sliderContainer = d3.select('#slider');
-        	var slider = d3.slider().axis(true).value(value).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
-                heatMap.render(dataSet[value - minHr]);
-                update_state_list(dataSet[value - minHr].values)
-                value = value;
-            });
-        	sliderContainer.selectAll("*").remove();
-        	sliderContainer.call(slider);
-            update_state_list(dataSet[value - minHr].values)
-            heatMap.render(dataSet[value - minHr]);
-        }
+        d3.select("#" + containerId + " svg").remove();
+
+        heatMap = new GRAPHZ.USHeatMap(containerId);
 
         function renderHourlyMap(dataSet, value){
           heatMap.render(dataSet[value - minHr]);
-          update_state_list(dataSet[value - minHr].values)
-          clock.refreshDisplay(value)
+          update_state_list(dataSet[value - minHr].values);
           d3.select('#hourly-count-view')[0][0].selectedIndex = value;
-          //d3.select('#main-content').style({'background': "url('./data/photo-" + Math.floor(value/3) + '.jpeg' + "') no-repeat", 'background-size': 'cover'}).transition().delay(500);
-          // $('.inner').animate({backgroundColor: '#' + bgColor[value]});
        }
-
+     
         d3.select('#play-btn').on('click', function(){
         	if(changeDuration){
         		window.clearInterval(changeDuration);
@@ -104,23 +91,28 @@ var GRAPHZ =  GRAPHZ || {},
         if (daily) {
             heatMap.render(aggregate(dataSet));
         } else {
-        	dataSetToRender = transform(dataSet);
-        	renderSlider(dataSetToRender, minHr, minHr, maxHr);
+            dataSetToRender = transform(dataSet);
+            renderHourlyMap(dataSetToRender, value)
+            //update_state_list(dataSetToRender[value - minHr].values)
+            //heatMap.render(dataSetToRender[value - minHr]);
         }
 
     };
 
-    $('#menu').on('click', function(e){
+
+    $('#toggle-btn').on('click', function(){
         // this code can be written better
-        $('#state-data').toggle()
+        
         if($('#state-data').is(":visible")){
+            $('#state-data').hide();
             $('#content').animate({
-                width: '65.3%'
+                width: '100%'
             }, 300 )
         }else{
             $('#content').animate({
-                width: "82.5%"
-            }, 300 );
+                width: "80%"
+            }, 100 );
+$('#state-data').show(500);
         }
         
     })
@@ -195,6 +187,7 @@ var GRAPHZ =  GRAPHZ || {},
         return [rev_data_map, state_list]
 
     }
+
     var processed_data = get_reverse_code(stateCodeMap)
     var reverse_stateCodeMap = processed_data[0] 
     var state_list = processed_data[1] 
@@ -265,32 +258,30 @@ var GRAPHZ =  GRAPHZ || {},
 
     function k_format(number){
         var k_number = parseInt(number)
-        k_number = Math.ceil(k_number/1000)
-        return k_number + 'k'
+        k_number = Math.ceil(k_number/1)
+        //return k_number + 'k'
+        return k_number.toLocaleString();
     }
 
     function update_state_list(data){
-        $('#state-data').empty()
-        // var table = $('#state-data').append($(table))
-        var html = '<table>';
+        $('#state-data').empty();
+        $('#totalVisits').empty();
+
+        var html = '', total=0, slno=1;
         for(var i in state_list){ 
-            // $('#state-data').append($('<li/>', {    //here appending `<li>`
-            //     'data-role': "list-divider"
-            // }).append($('<p/>', {    //here appending `<a>` into `<li>`
-            //     'class' : "text-primary",
-            //     'text': reverse_stateCodeMap[i] +", "+ data[i] + " visits"
-            // })));
+
             var key = state_list[i]
             if( key in data){
-                html += '<tr><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
-            }
+                html += '<tr><td>' + slno++ + '.</td><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + '  </td></tr>';
+                total+= data[key];
+            }          
             
         }
+        // set the total number of visits
+        $('#totalVisits').text(total.toLocaleString());
 
-        $('#state-data').append(html)
-        
-
-        // $('#state-data').listview('refresh');
+        // append the HTML generated to 
+        $('#state-data').append('<table class=\"table table-condensed\">' + html + '</table>');
 
     }
 })(window);
