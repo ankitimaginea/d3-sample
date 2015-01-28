@@ -22,7 +22,7 @@
     var defaults = {
         'width': '850',
         'height': '500',
-        'scale': 1000
+        'scale': 850
     };
     var getLegends = function (scale) {
         // var legends = [],
@@ -132,8 +132,10 @@
             height = options.height,
             projection = d3.geo.albersUsa()
             .scale(options.scale)
-            .translate([width / 2, height / 2]);
-            
+            .translate([width / 2, height / 2])
+            .precision(.1);
+        
+        this.projection = projection;    
         this.containerId = containerId;
         this.container = d3.select("#" + containerId);
         this.container.classed('us-heat-map', true);
@@ -166,4 +168,31 @@
             }
         }
     };
+    GRAPHZ.USHeatMap.prototype.resizeMap = function() {
+        var map = this.svg;
+        var mapRatio = .5;
+
+        // adjust as the window size changes
+        var width = parseInt(d3.select('#graph-container').style('width'))
+        //var width = parseInt(map.style('width'));
+        var height = width * mapRatio;
+
+        // update projection
+        this.projection
+            .translate([width / 2, height / 2])
+            .scale(width);
+
+        // resize the map svg
+        map
+            .style('width', width + 'px')
+            .style('height', height + 'px') 
+            .attr("viewBox", "0 0 ".concat(width, " ", height));
+            
+        // resize the map
+        map.select('.land').attr('d', this.path);
+        map.selectAll('.state').attr('d', this.path);
+
+    }
+  // -resize of map
+
 })();

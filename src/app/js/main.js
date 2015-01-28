@@ -88,6 +88,13 @@ var GRAPHZ =  GRAPHZ || {},
           renderHourlyMap(dataSetToRender, parseInt(this.options[this.selectedIndex].text));
         })
 
+    //handle the resize of the window
+    d3.select(window).on('resize', function () {
+        heatMap.resizeMap();
+    }
+
+        );
+
         if (daily) {
             heatMap.render(aggregate(dataSet));
         } else {

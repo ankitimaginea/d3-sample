@@ -45,7 +45,7 @@
 
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xs-12 col-sm-9 col-lg-9" style="border:1px solid red">
+      <div class="col-xs-12 col-sm-9 col-lg-9">
         <div id="graph-container">
 
         </div>
@@ -82,8 +82,8 @@
         </div>
 
       </div>
-      <div class="col-xs-6 col-sm-3 col-lg-3 hidden-xs" style="border:1px solid red" margin="0">
-        <div style="border:1px solid green">
+      <div class="col-xs-6 col-sm-3 col-lg-3 hidden-xs">
+        <div >
           <h5>UNITED STATES OF AMERICA</h5>
           <h3><span id="totalVisits"></span> &nbsp; Visits</h3>
         </div>
@@ -106,45 +106,6 @@
   <!--[if IE]><script type="text/javascript" src="app/js/excanvas.js"></script><![endif]-->
 
   <script>
-    // handle the resize of the map.
-    var width = parseInt(d3.select('#graph-container').style('width'))
-    , mapRatio = .5
-    , height = width * mapRatio;
-
-    var projection = d3.geo.albersUsa()
-        .scale(width)
-        .translate([width / 2, height / 2]);
-
-    var path = d3.geo.path()
-        .projection(projection);
-
-    var map = d3.select('#graph-container');
-    var mapSvg = d3.select("svg");
-
-    //handle the resize of the window
-    d3.select(window).on('resize', resizeMap);
-
-    function resizeMap() {
-        // adjust as the window size changes
-        width = parseInt(map.style('width'));
-        height = width * mapRatio;
-
-        // update projection
-        projection
-            .translate([width / 2, height / 2])
-            .scale(width);
-
-        // resize the map svg
-        mapSvg
-            .style('width', width + 'px')
-            .style('height', height + 'px');        
-        
-        // resize the map
-        map.select('.land').attr('d', path);
-        map.selectAll('.state').attr('d', path);
-
-    }
-  // -resize of map
 
     function toggleView(view) {
 
@@ -163,7 +124,6 @@
     
     window.onload = function(){
     		renderCount(true);
-        resizeMap();
     };
 
     function renderCount(daily) {
