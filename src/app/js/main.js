@@ -4,6 +4,22 @@ var GRAPHZ =  GRAPHZ || {},
     bgColor = ['000000','202020','404040', '606060', '808080','a0a0a0', 'c0c0c0', 'eoeoeo', 'ffffff', 'ffffcc', 'ffff99', 'ffff66','ffff33', 'ffff00', '99ccff', '66b2ff', '004c99', '003366', 'a0a0a0', '808080', '606060', '404040', '202020', '000000'];
 
 (function(){
+
+    var minHr = 0;
+    var maxHr = 23;
+    var dataSetToRender;
+    var value = minHr;
+    var play = false;
+
+    var heatMapOptions = {
+                'width': '100%',
+                'height': '100%'
+            };
+            
+    var containerId = "graph-container";
+    // d3.select("#" + containerId + " div").remove();
+    var heatMap = null
+
     GRAPHZ.util = {};
     GRAPHZ.util.extendMap = function(map1, map2){
         var extendedMap = {};
@@ -16,7 +32,42 @@ var GRAPHZ =  GRAPHZ || {},
         }
         return extendedMap;
     };
-    GRAPHZ.util.refreshClock = function(value){
+   //  GRAPHZ.util.refreshClock = function(value){
+        
+   //      // clock.refreshDisplay(value)
+
+   // }
+
+    GRAPHZ.start = function (dataURL, daily) {
+        var dataSet = clickData;
+    	var proxyDataURL = dataURL;
+        value = minHr;
+
+        if(!heatMap){
+            heatMap = new GRAPHZ.USHeatMap('graph-container');
+        }
+
+        if (daily) {
+            renderData(aggregate(dataSet), minHr)
+        } else {
+        	dataSetToRender = transform(dataSet);
+            renderHourlyMap(dataSetToRender, value)
+        }
+
+    };
+
+    function renderData(dataSet, value){
+        update_state_list(dataSet.values)
+        heatMap.render(dataSet)
+    }
+
+    function renderHourlyMap(dataSet, value){
+        renderData(dataSet[value - minHr], value)
+        refreshClock(value)
+        d3.select('#hourly-count-view')[0][0].selectedIndex = value;
+    }
+
+    function refreshClock(value){
         if(value>=0 && value<=12){
             $('.am').addClass('active')
             $('.pm').removeClass('active')
@@ -24,104 +75,59 @@ var GRAPHZ =  GRAPHZ || {},
             $('.am').removeClass('active')
             $('.pm').addClass('active')
         }
-        clock.refreshDisplay(value)
-
-   }
-
-    GRAPHZ.start = function (dataURL, daily) {
-        var dataSet = clickData;
-    	var proxyDataURL = dataURL;
-        var heatMapOptions = {
-                'width': '100%',
-                'height': '100%'
-            },
-            heatMap,
-            dataGenerator = GRAPHZ.USHeatMapDataGenerator,
-            minHr = 0,
-            maxHr = 23,
-            dataSetToRender,
-            value = minHr;
-          	play = false;
-        var containerId = "graph-container";
-        d3.select("#" + containerId + " div").remove();
-        heatMap = new GRAPHZ.USHeatMap('graph-container');
-
-        function renderSlider(dataSet, value){
-        	var sliderContainer = d3.select('#slider');
-        	var slider = d3.slider().axis(true).value(value).min(minHr).max(maxHr).step(1).on("slide", function (evt, value) {
-                heatMap.render(dataSet[value - minHr]);
-                update_state_list(dataSet[value - minHr].values)
-                value = value;
-            });
-        	sliderContainer.selectAll("*").remove();
-        	sliderContainer.call(slider);
-            update_state_list(dataSet[value - minHr].values)
-            heatMap.render(dataSet[value - minHr]);
-        }
-
-        function renderHourlyMap(dataSet, value){
-          heatMap.render(dataSet[value - minHr]);
-          update_state_list(dataSet[value - minHr].values)
-          GRAPHZ.util.refreshClock(value)
-          d3.select('#hourly-count-view')[0][0].selectedIndex = value;
-          //d3.select('#main-content').style({'background': "url('./data/photo-" + Math.floor(value/3) + '.jpeg' + "') no-repeat", 'background-size': 'cover'}).transition().delay(500);
-          // $('.inner').animate({backgroundColor: '#' + bgColor[value]});
-       }
-
         
-        d3.select('#play-btn').on('click', function(){
-        	if(changeDuration){
-        		window.clearInterval(changeDuration);
-        		changeDuration = undefined;
-        		this.textContent = 'Play';
-        	} else{
-            this.textContent = 'Stop';
-        		changeDuration = window.setInterval(function(){
-	            	if(value == maxHr){
-	            		value = minHr;
-	            	} else {
-	            		value++;
-	            	}
-                renderHourlyMap(dataSetToRender, value);
-	            	return play;
-	            }, 1000);
+        var hdegree = value * 30;
+        var hrotate = "rotate(" + hdegree + "deg)";
+        $("#hour").css({"-moz-transform" : hrotate, "-webkit-transform" : hrotate});
 
-        	}
-        });
+    }
 
-        d3.select('#prev-btn').on('click', function(){
-          var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
-          if (currentHour == 0) {
-            currentHour = 24;
-          }
+    d3.select('#play-btn').on('click', function(){
+        if(changeDuration){
+            window.clearInterval(changeDuration);
+            changeDuration = undefined;
+            this.textContent = 'Play';
+        } else{
+        this.textContent = 'Stop';
+            changeDuration = window.setInterval(function(){
+                if(value == maxHr){
+                    value = minHr;
+                } else {
+                    value++;
+                }
+            renderHourlyMap(dataSetToRender, value);
+                return play;
+            }, 1000);
 
-          d3.select('#hourly-count-view')[0][0].selectedIndex == --currentHour;
-
-          renderHourlyMap(dataSetToRender, currentHour);
-        });
-
-        d3.select('#next-btn').on('click', function(){
-          var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
-
-          if (currentHour == 23) {
-            currentHour = -1;
-          }
-          d3.select('#hourly-count-view')[0][0].selectedIndex == ++currentHour;
-          renderHourlyMap(dataSetToRender, currentHour);
-        });
-
-        d3.select('#hourly-count-view').on('change', function(){
-          renderHourlyMap(dataSetToRender, parseInt(this.options[this.selectedIndex].text));
-        })
-
-        if (daily) {
-            heatMap.render(aggregate(dataSet));
-        } else {
-        	dataSetToRender = transform(dataSet);
-        	renderSlider(dataSetToRender, minHr, minHr, maxHr);
         }
+    });
 
-    };
+    d3.select('#prev-btn').on('click', function(){
+      var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
+      if (currentHour == 0) {
+        currentHour = 24;
+      }
+
+      d3.select('#hourly-count-view')[0][0].selectedIndex == --currentHour;
+
+      renderHourlyMap(dataSetToRender, currentHour);
+    });
+
+    d3.select('#next-btn').on('click', function(){
+      var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
+
+      if (currentHour == 23) {
+        currentHour = -1;
+      }
+      d3.select('#hourly-count-view')[0][0].selectedIndex == ++currentHour;
+      renderHourlyMap(dataSetToRender, currentHour);
+    });
+
+    d3.select('#hourly-count-view').on('change', function(){
+        value = parseInt(this.options[this.selectedIndex].text)
+      renderHourlyMap(dataSetToRender, value);
+    })
+
 
     $('#toggle-btn').on('click', function(){
         // this code can be written better
@@ -129,16 +135,16 @@ var GRAPHZ =  GRAPHZ || {},
         if($('#state-data').is(":visible")){
             $('#state-data').hide();
             
-            $('#toggle-btn i').removeClass('icon-arrow-right')
-            $('#toggle-btn i').addClass('icon-arrow-left')
+            $('#toggle-btn i').removeClass('glyphicon-hand-right')
+            $('#toggle-btn i').addClass('glyphicon-hand-left')
 
             $('#content').removeClass('wd-220-diff')
             $('#content').animate({
                 width: '100%'
             }, 300 )
         }else{
-            $('#toggle-btn i').removeClass('icon-arrow-left')
-            $('#toggle-btn i').addClass('icon-arrow-right')
+            $('#toggle-btn i').removeClass('glyphicon-hand-left')
+            $('#toggle-btn i').addClass('glyphicon-hand-right')
 
             $('#content').addClass('wd-220-diff', 300)
             $('#state-data').show();
@@ -292,27 +298,15 @@ var GRAPHZ =  GRAPHZ || {},
 
     function update_state_list(data){
         $('#state-data').empty()
-        // var table = $('#state-data').append($(table))
         var html = '', total=0;
         for(var i in state_list){ 
-            // $('#state-data').append($('<li/>', {    //here appending `<li>`
-            //     'data-role': "list-divider"
-            // }).append($('<p/>', {    //here appending `<a>` into `<li>`
-            //     'class' : "text-primary",
-            //     'text': reverse_stateCodeMap[i] +", "+ data[i] + " visits"
-            // })));
             var key = state_list[i]
             if( key in data){
                 html += '<tr><td style="text-transform: capitalize;">' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
                 total+= data[key];
             }          
-            
         }
-
         $('#state-data').append('<table><tr><td><b> Total: </b></td>' + '<td><b>' + k_format(total) + '</b></td></tr>' + html + '</html>');
-        
-
-        // $('#state-data').listview('refresh');
 
     }
 })(window);

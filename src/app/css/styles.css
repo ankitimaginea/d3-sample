@@ -64,7 +64,6 @@ button {
   margin: 0;
   padding: 0;
   list-style-type: none;
-  margin-top: -180px;
   position: absolute;
   margin-left: 52px;
 }
@@ -82,3 +81,26 @@ button {
 }
 /*.wd-100{width: '100%'}*/
 .wd-220-diff{width: calc(100% - 220px) !important}
+
+
+/* analog clock css */
+#clock {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 20px auto 0 auto;
+  background: url(img/clockface.jpg);
+  list-style: none;
+  background-size: 100% 100%;
+}
+   
+#hour {
+  position: relative;
+  width: 10px;
+  height: 165px;
+  top: -7px;
+  left: 31px;
+  background: url(img/hourhand.png);
+  z-index: 1;
+  background-size: 100% 100%;
+}

@@ -13,18 +13,6 @@
             [0,104,55],
             [0,69,41]
         ]
-
-        // var pallete_arr = [
-        // [255,255,204],
-        // [255,237,160],
-        // [254,217,118],
-        // [254,178,76],
-        // [253,141,60],
-        // [252,78,42],
-        // [227,26,28],
-        // [189,0,38],
-        // [128,0,38]
-        // ]
         return pallete_arr
 
     }
@@ -82,7 +70,6 @@
                     value = data.values[stateCode], 
                     scale = data.scale
                 return 'rgb('+get_rgb(value, 0, scale.max)+')';
-                // return 'rgb(255,'+(255 - Math.ceil(value/scale.max * 255))+',0)';
             })
             .on('mouseover', function(state){
              	var stateCode = state.properties.code,
@@ -94,8 +81,44 @@
         self.svg.on('mouseout', function(){
         	self.popup.style('display', 'none');
         });
-        renderLegends(self.svg.append('g'), legends, legendOffset);
+        renderLegends(self.svg.selectAll('g'), legends, legendOffset);
     };
+
+    var renderDataq = function (usMapInfo, data, legendOffset) {
+        var self = this,
+            legends = getLegends(data.scale),
+            us = usMapInfo;
+        legendOffset = legendOffset || [800, 400];
+        self.svg.selectAll('path').remove()
+        self.svg.insert("path", ".grpahz-legends")
+            .datum(topojson.feature(us, us.objects.land))
+            .attr("class", "land")
+            .attr("d", self.path);
+        self.svg.selectAll('g')
+            .attr("class", "states")
+            .selectAll("path")
+            .data(topojson.feature(us, us.objects.states).features)
+            .enter().append("path")
+            .attr('class', 'state')
+            .style('fill', function (state) {
+                var stateCode = state.properties.code,
+                    value = data.values[stateCode], 
+                    scale = data.scale
+                return 'rgb('+get_rgb(value, 0, scale.max)+')';
+            })
+            .on('mouseover', function(state){
+                var stateCode = state.properties.code,
+                    stateName = stateNames[stateCode],
+                    value = data.values[stateCode];
+                showStateHoverPopup.call(self, [d3.event.pageX, d3.event.pageY], stateName, value);
+            })
+            .attr("d", self.path);
+        self.svg.on('mouseout', function(){
+            self.popup.style('display', 'none');
+        });
+        renderLegends(self.svg.selectAll('g'), legends, legendOffset);
+    };
+
     var get_rgb = function(value, min, max){
         if(value == undefined){
             return '0,0,0'
@@ -141,7 +164,6 @@
     };
     GRAPHZ.USHeatMap.prototype.render = function (data, legendOffset, callback) {
         var containerId = this.containerId;
-        this.svg.selectAll('g').remove();
         var self = this;
         if (!this.usMapInfo) {
             d3.json("data/us.state.map.json", function (error, us) {
@@ -149,7 +171,13 @@
                 self.render(data, legendOffset, callback);
             });
         } else {
-            renderData.call(this, this.usMapInfo, data, legendOffset);
+            if(this.svg.selectAll('g').node()){
+                renderDataq.call(this, this.usMapInfo, data, legendOffset);
+            }else{
+                this.svg.selectAll('g').remove();
+                renderData.call(this, this.usMapInfo, data, legendOffset);
+            }
+            
             if (callback) {
                 callback();
             }
