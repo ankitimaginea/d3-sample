@@ -40,16 +40,20 @@ var GRAPHZ =  GRAPHZ || {},
         function renderHourlyMap(dataSet, value){
           heatMap.render(dataSet[value - minHr]);
           update_state_list(dataSet[value - minHr].values);
+          $('#hour').text(value + ":00");
           d3.select('#hourly-count-view')[0][0].selectedIndex = value;
        }
+
      
-        d3.select('#play-btn').on('click', function(){
+        d3.select('#play-btn')
+          .attr("title","Play animation")
+          .on('click', function(){
         	if(changeDuration){
         		window.clearInterval(changeDuration);
         		changeDuration = undefined;
-        		this.textContent = 'Play';
+        		$('span', this).addClass("glyphicon-play").removeClass("glyphicon-pause");
         	} else{
-            this.textContent = 'Stop';
+                $('span', this).addClass("glyphicon-pause").removeClass("glyphicon-play");
         		changeDuration = window.setInterval(function(){
 	            	if(value == maxHr){
 	            		value = minHr;
@@ -69,8 +73,10 @@ var GRAPHZ =  GRAPHZ || {},
             currentHour = 24;
           }
 
-          d3.select('#hourly-count-view')[0][0].selectedIndex == --currentHour;
-
+          // change the value for time representation
+          $('#hour').text(--currentHour + ":00");
+          d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
+          
           renderHourlyMap(dataSetToRender, currentHour);
         });
 
@@ -80,7 +86,11 @@ var GRAPHZ =  GRAPHZ || {},
           if (currentHour == 23) {
             currentHour = -1;
           }
-          d3.select('#hourly-count-view')[0][0].selectedIndex == ++currentHour;
+          
+          // change the value for time representation
+          $('#hour').text(++currentHour + ":00");
+          d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
+          
           renderHourlyMap(dataSetToRender, currentHour);
         });
 
@@ -279,7 +289,7 @@ $('#state-data').show(500);
 
             var key = state_list[i]
             if( key in data){
-                html += '<tr><td>' + slno++ + '.</td><td>' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + '  </td></tr>';
+                html += '<li class=\"list-group-item\"><span>' + slno++ + '.</span><span class=\"text-capitalize\">' + reverse_stateCodeMap[key] + '</span><span>' + k_format(data[key]) + '  </span></li>';
                 total+= data[key];
             }          
             
@@ -288,7 +298,7 @@ $('#state-data').show(500);
         $('#totalVisits').text(total.toLocaleString());
 
         // append the HTML generated to 
-        $('#state-data').append('<table class=\"table table-condensed\">' + html + '</table>');
+        $('#state-data').append('<ul class=\"list-group\">' + html + '</ul>');
 
     }
 })(window);
