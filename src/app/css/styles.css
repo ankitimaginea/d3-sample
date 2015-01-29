@@ -10,7 +10,7 @@ h6, h5, h3{
 /** state list view **/
 .list-group {  
   padding-left: 0;  
-  margin-bottom: 20px;  
+  margin-bottom: 20px;
 }  
   
 .list-group-item {  
@@ -18,7 +18,7 @@ h6, h5, h3{
   display: block;  
   padding: 2px 2px;  
   margin-bottom: -1px;  
-  background-color: #ffffff;  
+  background-color: rgb(247,247,247);  
   border: 1px solid #dddddd;  
 }  
 .list-group-item:first-child {
@@ -60,17 +60,3 @@ h6, h5, h3{
   padding-right: 0px;
 }
 
-/** Style for the line graph  **/
-.chart rect {
-  fill: steelblue;
-}
-
-.chart text {
-  fill: black;
-}
-
-.axis path, .axis line {
-  fill: none;
-  stroke: black;
-  shape-rendering: crispEdges;
-}
