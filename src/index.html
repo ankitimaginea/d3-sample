@@ -26,12 +26,6 @@
   <nav class="navbar navbar-inverse navbar-static-top navbar-sm">
     <div class="container">
       <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
         <a class="navbar-brand navbar-link" href="#">Click Stream Report</a>
       </div>
       <div id="navbar" class="navbar-collapse collapse">
@@ -46,8 +40,8 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-xs-12 col-sm-9 col-lg-9">
-        <div>
-          <div id="hourlyCountView" style="display:none;" align="center">
+        <div id="timerControlGrp" align="center">
+          <div id="hourlyCountView" style="display:none;" >
             <span id="time">
               <p>Data at :</p>
               <p id="hour">12:00</p>
@@ -89,7 +83,20 @@
               <option class="hourly-count">23</option>
             </select>
           </div>
-
+          <div id="legend">
+            <small><!- Put text for legend here. -></small>
+            <ul class="list-inline">
+              <li class="key">Min</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">Max</li>
+            </ul>
+          </div>
         </div>
         <div id="graph-container">
 
@@ -101,7 +108,7 @@
           <h5>UNITED STATES OF AMERICA</h5>
           <h3><span id="totalVisits"></span> &nbsp; Visits</h3>
         </div>
-        <div><h6>MOST VISITS</h6></div>
+        <div><h6 class="text-uppercase">Alphabetically sorted by State</h6></div>
         <div id="state-data">
 
         </div>
@@ -139,6 +146,7 @@
     
     window.onload = function(){
     		renderCount(true);
+        colorizeLegend();
     };
 
     function renderCount(daily) {
@@ -155,8 +163,24 @@
         node.style.display = (display)? 'block':'none';
     }
 
-
-
+    function colorizeLegend(){
+      //TODO - copied the variable declaration from object declaration in us-heat-map.js file. 
+      // would be best to use same variable by exposing it properly. 
+      var pallete_arr = [
+            [255,255,229],
+            [247,252,185],
+            [217,240,163],
+            [173,221,142],
+            [120,198,121],
+            [65,171,93],
+            [35,132,67],
+            [0,104,55],
+            [0,69,41]
+          ]
+      var nodes = $('.key');
+      for (var i = 0; i <nodes.length; i++)
+        nodes[i].style.borderTopColor = 'rgb(' + pallete_arr[i].join() +')';
+    }
 
   </script>
 

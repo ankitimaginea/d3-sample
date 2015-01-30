@@ -34,6 +34,10 @@ h6, h5, h3{
   padding-right: 5px;
 }  
 
+#timerControlGrp{
+  padding-top: 10px;
+}
+
 #time{
   display: inline-block;
   vertical-align: middle;
@@ -59,4 +63,21 @@ h6, h5, h3{
   padding-left: 0px;
   padding-right: 0px;
 }
+
+#legend {
+    padding: 1.5em 0 0 1.5em;
+}
+#legend ul{
+  margin-bottom: 0em;
+}
+
+li.key {
+    border-top-width: 15px;
+    border-top-style: solid;
+    font-size: .75em;
+    width: 10%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
 

@@ -87,9 +87,8 @@
             .style('fill', function (state) {
                 var stateCode = state.properties.code,
                     value = data.values[stateCode], 
-                    scale = data.scale
+                    scale = data.scale;
                 return 'rgb('+get_rgb(value, 0, scale.max)+')';
-                // return 'rgb(255,'+(255 - Math.ceil(value/scale.max * 255))+',0)';
             })
             .on('mouseover', function(state){
              	var stateCode = state.properties.code,
@@ -115,9 +114,9 @@
     	var self = this;
     	self.popup
     		.style('left', at[0] + "px")
-    		.style('top', at[1] + "px")
+    		.style('top', at[1] - 50 + "px")
     		.selectAll("*").remove();
-
+        // TODO - put in a dirty fix to bring the "tooltip" closer to the mouse. Fix later.
     	self.popup.html(['<span class="state-code">',
     								state,
     								'</span>',
@@ -187,7 +186,7 @@
             .style('width', width + 'px')
             .style('height', height + 'px') 
             .attr("viewBox", "0 0 ".concat(width, " ", height));
-            
+
         // resize the map
         map.select('.land').attr('d', this.path);
         map.selectAll('.state').attr('d', this.path);
