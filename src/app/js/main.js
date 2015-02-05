@@ -32,11 +32,6 @@ var GRAPHZ =  GRAPHZ || {},
         }
         return extendedMap;
     };
-   //  GRAPHZ.util.refreshClock = function(value){
-        
-   //      // clock.refreshDisplay(value)
-
-   // }
 
     GRAPHZ.start = function (dataURL, daily) {
         var dataSet = clickData;
@@ -62,45 +57,34 @@ var GRAPHZ =  GRAPHZ || {},
     }
 
     function renderHourlyMap(dataSet, value){
-        renderData(dataSet[value - minHr], value)
-        refreshClock(value)
-        d3.select('#hourly-count-view')[0][0].selectedIndex = value;
-    }
+      heatMap.render(dataSet[value - minHr]);
+      update_state_list(dataSet[value - minHr].values);
+      $('#hour').text(value + ":00");
+      d3.select('#hourly-count-view')[0][0].selectedIndex = value;
+   }
 
-    function refreshClock(value){
-        if(value>=0 && value<=12){
-            $('.am').addClass('active')
-            $('.pm').removeClass('active')
-        }else{
-            $('.am').removeClass('active')
-            $('.pm').addClass('active')
-        }
-        
-        var hdegree = value * 30;
-        var hrotate = "rotate(" + hdegree + "deg)";
-        $("#hour").css({"-moz-transform" : hrotate, "-webkit-transform" : hrotate});
 
-    }
+    d3.select('#play-btn')
+          .attr("title","Play animation")
+          .on('click', function(){
+            if(changeDuration){
+                window.clearInterval(changeDuration);
+                changeDuration = undefined;
+                $('span', this).addClass("glyphicon-play").removeClass("glyphicon-pause");
+            } else{
+                $('span', this).addClass("glyphicon-pause").removeClass("glyphicon-play");
+                changeDuration = window.setInterval(function(){
+                    if(value == maxHr){
+                        value = minHr;
+                    } else {
+                        value++;
+                    }
+                renderHourlyMap(dataSetToRender, value);
+                    return play;
+                }, 1000);
 
-    d3.select('#play-btn').on('click', function(){
-        if(changeDuration){
-            window.clearInterval(changeDuration);
-            changeDuration = undefined;
-            this.textContent = 'Play';
-        } else{
-        this.textContent = 'Stop';
-            changeDuration = window.setInterval(function(){
-                if(value == maxHr){
-                    value = minHr;
-                } else {
-                    value++;
-                }
-            renderHourlyMap(dataSetToRender, value);
-                return play;
-            }, 1000);
-
-        }
-    });
+            }
+        });
 
     d3.select('#prev-btn').on('click', function(){
       var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
@@ -108,25 +92,38 @@ var GRAPHZ =  GRAPHZ || {},
         currentHour = 24;
       }
 
-      d3.select('#hourly-count-view')[0][0].selectedIndex == --currentHour;
-
+      // change the value for time representation
+      $('#hour').text(--currentHour + ":00");
+      d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
+      
       renderHourlyMap(dataSetToRender, currentHour);
     });
 
     d3.select('#next-btn').on('click', function(){
-      var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
+          var currentHour = d3.select('#hourly-count-view')[0][0].selectedIndex;
 
-      if (currentHour == 23) {
-        currentHour = -1;
-      }
-      d3.select('#hourly-count-view')[0][0].selectedIndex == ++currentHour;
-      renderHourlyMap(dataSetToRender, currentHour);
-    });
+          if (currentHour == 23) {
+            currentHour = -1;
+          }
+          
+          // change the value for time representation
+          $('#hour').text(++currentHour + ":00");
+          d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
+          
+          renderHourlyMap(dataSetToRender, currentHour);
+        });
 
-    d3.select('#hourly-count-view').on('change', function(){
-        value = parseInt(this.options[this.selectedIndex].text)
-      renderHourlyMap(dataSetToRender, value);
-    })
+        d3.select('#hourly-count-view').on('change', function(){
+          renderHourlyMap(dataSetToRender, parseInt(this.options[this.selectedIndex].text));
+        })
+
+    //handle the resize of the window
+    d3.select(window).on('resize', function () {
+                heatMap.resizeMap();
+        }
+    );
+
+        
 
 
     $('#toggle-btn').on('click', function(){
@@ -134,21 +131,15 @@ var GRAPHZ =  GRAPHZ || {},
         
         if($('#state-data').is(":visible")){
             $('#state-data').hide();
-            
-            $('#toggle-btn i').removeClass('glyphicon-hand-right')
-            $('#toggle-btn i').addClass('glyphicon-hand-left')
-
-            $('#content').removeClass('wd-220-diff')
             $('#content').animate({
                 width: '100%'
             }, 300 )
         }else{
-            $('#toggle-btn i').removeClass('glyphicon-hand-left')
-            $('#toggle-btn i').addClass('glyphicon-hand-right')
-
-            $('#content').addClass('wd-220-diff', 300)
-            $('#state-data').show();
-        }
+            $('#content').animate({
+                width: "80%"
+            }, 100 );
+        $('#state-data').show(500);
+                }
         
     })
 
@@ -297,16 +288,24 @@ var GRAPHZ =  GRAPHZ || {},
     }
 
     function update_state_list(data){
-        $('#state-data').empty()
-        var html = '', total=0;
+        $('#state-data').empty();
+        $('#totalVisits').empty();
+
+        var html = '', total=0, slno=1;
         for(var i in state_list){ 
+
             var key = state_list[i]
             if( key in data){
-                html += '<tr><td style="text-transform: capitalize;">' + reverse_stateCodeMap[key] + '</td><td>' + k_format(data[key]) + ' visits </td></tr>';
+                html += '<li class=\"list-group-item\"><span>' + slno++ + '.</span><span class=\"text-capitalize\">' + reverse_stateCodeMap[key] + '</span><span>' + k_format(data[key]) + '  </span></li>';
                 total+= data[key];
             }          
+            
         }
-        $('#state-data').append('<table><tr><td><b> Total: </b></td>' + '<td><b>' + k_format(total) + '</b></td></tr>' + html + '</html>');
+        // set the total number of visits
+        $('#totalVisits').text(total.toLocaleString());
+
+        // append the HTML generated to 
+        $('#state-data').append('<ul class=\"list-group\">' + html + '</ul>');
 
     }
 })(window);

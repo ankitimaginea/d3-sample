@@ -1,106 +1,83 @@
-body {
-    background : #171b23;
-    margin: 0 auto;
-}
-#header, #count-view {
-  color: black;
+
+.navbar{
+  margin-bottom: 0px;
 }
 
-#header {
-  background : lightgrey;
-  padding: 1.3em 1.3em;
-  overflow : hidden;
-  opacity: 0.6;
+h6, h5, h3{
+  padding-left: 10px;
 }
 
-#slider{
-    width: 500px;
-    margin: 10px auto;
-    border-radius: 5px;
-    height: 10px;
-    background: #f3f3f3
+/** state list view **/
+.list-group {  
+  padding-left: 0;  
+  margin-bottom: 20px;
+}  
+  
+.list-group-item {  
+  position: relative;  
+  display: block;  
+  padding: 2px 2px;  
+  margin-bottom: -1px;  
+  background-color: rgb(247,247,247);  
+  border: 1px solid #dddddd;  
+}  
+.list-group-item:first-child {
+  border-top-left-radius: 0px; 
+  border-top-right-radius: 0px; 
 }
-#slider.d3-slider-horizontal .d3-slider-handle{
-    top: -0.4em;
+.list-group-item:last-child {
+  border-bottom-left-radius: 0px; 
+  border-bottom-right-radius: 0px; 
 }
-#graph-container {
-    width : 900px;
-    height : 600px;
-    margin : 0 auto;
-}
-#graph-container .grpahz-legend{
-    display : none;
-}
-input[type="range"]{
-    display : block;
-    width  : 500px;
-    margin : 0 auto;
+.list-group-item span{
+  padding-left:5px;
+  padding-right: 5px;
+}  
+
+#timerControlGrp{
+  padding-top: 10px;
 }
 
-#hourly-count-view {
+#time{
   display: inline-block;
-  margin-left: 40%;
+  vertical-align: middle;
+  border-left: 5px solid #ccc;
+  padding: 3px 0 3px 10px;
 }
 
-button {
-	margin: 10px auto;
-	font-weight: bold;
-  font-size: 1.1em;
-	background: #f4f4f4;
-	border: 1px solid #939393;
-	border-radius: 5px;
-}
-
-
-#state-data table {
-  width: 180px;
-}
-
-#state-data table tr {
-  border-bottom: 1px solid #000;
-}
-
-#am-pm ul{
+#time p{
   margin: 0;
-  padding: 0;
-  list-style-type: none;
-  position: absolute;
-  margin-left: 52px;
 }
-#am-pm ul li{
-  display: inline;
-  padding: 2px 5px;
-  background-color: #655;
-  color: #522;
+#time p:first-child{
+  color: #999;
+  font-size: 11px;
+  line-height: 13px;
 }
-.am{border-radius: 5px 0 0 5px;}
-.pm{border-radius: 0 5px 5px 0;}
-#am-pm ul li.active{
-  background-color: #fb3c2d;
-  color: #fff;
+#time p#hour{
+  font-size: 30px;
+  line-height: 30px;
 }
-/*.wd-100{width: '100%'}*/
-.wd-220-diff{width: calc(100% - 220px) !important}
+
+.panelSeperator{
+  border-left: 1px solid #ccc;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+#legend {
+    padding: 1.5em 0 0 1.5em;
+}
+#legend ul{
+  margin-bottom: 0em;
+}
+
+li.key {
+    border-top-width: 15px;
+    border-top-style: solid;
+    font-size: .75em;
+    width: 10%;
+    padding-left: 0;
+    padding-right: 0;
+}
 
 
-/* analog clock css */
-#clock {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 20px auto 0 auto;
-  background: url(img/clockface.jpg);
-  list-style: none;
-  background-size: 100% 100%;
-}
-   
-#hour {
-  position: relative;
-  width: 10px;
-  height: 165px;
-  top: -7px;
-  left: 31px;
-  background: url(img/hourhand.png);
-  z-index: 1;
-  background-size: 100% 100%;
-}

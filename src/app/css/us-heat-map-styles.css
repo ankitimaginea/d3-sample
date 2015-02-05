@@ -1,9 +1,15 @@
-.d3-slider-axis text {
-    stroke : white;
+
+path {
+  stroke-linejoin: round;
+}
+
+.land-glow {
+  fill-opacity: .2;
+  filter: url(#blur);
 }
 
 div.us-heat-map  .state {
-  stroke: #000;
+  stroke: #fff;
   stroke-linejoin: round;
   cursor : pointer;
 }
@@ -23,6 +29,7 @@ div.us-heat-map div.us-heat-map-hover {
 	border-radius: 5px;
 	display:none;
 }
+
 div.us-heat-map div.us-heat-map-hover span.state-code{
 	display:block;
 	font-size: 1.2em;
@@ -34,6 +41,7 @@ div.us-heat-map div.us-heat-map-hover span.state-code{
 	border-top-right-radius: 5px;
 	border-top-left-radius: 5px;
 }
+
 div.us-heat-map div.us-heat-map-hover span.state-value{
 	display:block;
 	font-size: 1.4em;

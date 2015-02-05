@@ -1,30 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="./app/css/us-heat-map-styles.css">
-    <link rel="stylesheet" href="./app/css/styles.css">
     <title>Click Stream Report</title>
-
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
-     <!--[if IE]>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <![endif]-->
-    <!-- GLOBAL STYLES -->
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <![endif]-->
+
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.css" />
-    <link rel="stylesheet" href="assets/css/main.css" />
-    <link rel="stylesheet" href="assets/css/theme.css" />
-    <link rel="stylesheet" href="assets/css/MoneAdmin.css" />
-    
-    <!--END GLOBAL STYLES -->
+    <link rel="stylesheet" href="app/css/us-heat-map-styles.css">
+    <link rel="stylesheet" href="app/css/styles.css">
 
-    <!-- PAGE LEVEL STYLES -->
-    <link href="assets/css/layout2.css" rel="stylesheet" />
-    <!-- END PAGE LEVEL  STYLES -->
-
-
-     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -32,116 +21,123 @@
 
 </head>
 
-<body class="padTop53"> 
-
-    <div id="wrap">
-    <div id="top">
-
-            <nav class="navbar navbar-inverse navbar-fixed-top " style="padding-top: 10px;">
-                <div style="padding: 5px 10px;"> 
-                <!-- <select name="view" id="countView" onchange="return toggleView(event)">
-                    <option id="dailyCount" selected="true">Total Count</option>
-                    <option id="hourlyCount">Hourly Count</option>
-                  </select> -->
-                <div class="col-lg-4">
-                    <select class="form-control" name="view" id="countView" onchange="return toggleView(event)">
-                        <option id="dailyCount" selected="true">Total Count</option>
-                        <option id="hourlyCount">Hourly Count</option>
-                    </select>
-                </div>
-                <div class="col-lg-4" style="padding-left: 0;padding-top: 3px;">
-                    of Hits per state for Nov and Dec 2014
-                </div>
-                <div id="toggle-btn" style="float: right;width: 45px;">
-                    <ul id="menu" class="collapse"> 
-                        <li class="panel active">
-                            <a href="#">
-                                <i class="glyphicon glyphicon-hand-right"></i>
-                            </a>                   
-                        </li>
-                    </ul>
-                </div>
-                </div>
-            </nav>
+<body> 
+  <!--  navbar -->
+  <nav class="navbar navbar-inverse navbar-static-top navbar-sm">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand navbar-link" href="#">Click Stream Report</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li id="totCountLabel" class="active"><a href="#" onclick="toggleView('dailyCount')">Total Count</a></li>
+          <li id="hrlCountLabel"><a href="#" onclick="toggleView('hourlyCount')">Hourly Count</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
     </div>
+  </nav>  
 
-   
-    <div id="content" class="wd-220-diff">
-        <div class="inner" style="min-height: 700px; background-color:#000;">
-             <div id="graph-container">
-            </div>
-            <div id="hourlyCountView" style="display:none">
-                <div id="clock-container" style="position: absolute;right: 0;margin-right: 45px;bottom:230px;">
-                    <div id='am-pm'>
-                      <ul>
-                        <li class='am active'>AM</li>
-                        <li class='pm'>PM</li>
-                      </ul>
-                    </div>
-                    <ul id="clock"> 
-                        <li id="hour"></li>
-                    </ul>
-                </div>
-                
-                <select name="view" id="hourly-count-view">
-                  <option class="hourly-count" selected="true">0</option>
-                  <option class="hourly-count">1</option>
-                  <option class="hourly-count">2</option>
-                  <option class="hourly-count">3</option>
-                  <option class="hourly-count">4</option>
-                  <option class="hourly-count">5</option>
-                  <option class="hourly-count">6</option>
-                  <option class="hourly-count">7</option>
-                  <option class="hourly-count">8</option>
-                  <option class="hourly-count">9</option>
-                  <option class="hourly-count">10</option>
-                  <option class="hourly-count">11</option>
-                  <option class="hourly-count">12</option>
-                  <option class="hourly-count">13</option>
-                  <option class="hourly-count">14</option>
-                  <option class="hourly-count">15</option>
-                  <option class="hourly-count">16</option>
-                  <option class="hourly-count">17</option>
-                  <option class="hourly-count">18</option>
-                  <option class="hourly-count">19</option>
-                  <option class="hourly-count">20</option>
-                  <option class="hourly-count">21</option>
-                  <option class="hourly-count">22</option>
-                  <option class="hourly-count">23</option>
-                </select>
-                <button id='prev-btn'>&laquo;Prev</button>
-                <button id="play-btn">Play</button>
-                <button id='next-btn'>Next&raquo;</button>
-            </div> 
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12 col-sm-9 col-lg-9">
+        <div id="timerControlGrp" align="center">
+          <div id="hourlyCountView" style="display:none;" >
+            <span id="time">
+              <p>Data at :</p>
+              <p id="hour">12:00</p>
+            </span>
+            <button id='prev-btn' type="button" class="btn btn-default btn-lg"> 
+              <span class="glyphicon glyphicon-step-backward"></span>
+            </button>
+            <button id="play-btn" type="button" class="btn btn-default btn-lg">
+             <span class="glyphicon glyphicon-play"></span>
+            </button>
+            <button id='next-btn' type="button" class="btn btn-default btn-lg">
+              <span class="glyphicon glyphicon-step-forward"></span>
+            </button>
+            <!- TODO Select control is hidden for now. MUST REMOVE IT LATER.-->
+            <select name="view" id="hourly-count-view" style="display:none">
+              <option class="hourly-count" selected="true">0</option>
+              <option class="hourly-count">1</option>
+              <option class="hourly-count">2</option>
+              <option class="hourly-count">3</option>
+              <option class="hourly-count">4</option>
+              <option class="hourly-count">5</option>
+              <option class="hourly-count">6</option>
+              <option class="hourly-count">7</option>
+              <option class="hourly-count">8</option>
+              <option class="hourly-count">9</option>
+              <option class="hourly-count">10</option>
+              <option class="hourly-count">11</option>
+              <option class="hourly-count">12</option>
+              <option class="hourly-count">13</option>
+              <option class="hourly-count">14</option>
+              <option class="hourly-count">15</option>
+              <option class="hourly-count">16</option>
+              <option class="hourly-count">17</option>
+              <option class="hourly-count">18</option>
+              <option class="hourly-count">19</option>
+              <option class="hourly-count">20</option>
+              <option class="hourly-count">21</option>
+              <option class="hourly-count">22</option>
+              <option class="hourly-count">23</option>
+            </select>
+          </div>
+          <div id="legend">
+            <small><!- Put text for legend here. -></small>
+            <ul class="list-inline">
+              <li class="key">Min</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">&nbsp;</li>
+              <li class="key">Max</li>
+            </ul>
+          </div>
         </div>
-    </div>
+        <div id="graph-container">
 
-    <div id="right" style="padding:0">
-        <div id="state-data" style="overflow-y: scroll;overflow-x: hidden; height: 670px;padding: 20px 15px;">
         </div>
+ 
+      </div>
+      <div class="col-xs-6 col-sm-3 col-lg-3 hidden-xs panelSeperator" margin="0">
+        <div>
+          <h5>UNITED STATES OF AMERICA</h5>
+          <h3><span id="totalVisits"></span> &nbsp; Visits</h3>
+        </div>
+        <div><h6 class="text-uppercase">Alphabetically sorted by State</h6></div>
+        <div id="state-data">
+
+        </div>
+      </div>
     </div>
+  </div>
 
+  <script src="data/st.data.js"></script>
+  <script src="assets/plugins/jquery-2.0.3.min.js"></script>
+  <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+  <script src="lib/d3.min.js"></script>
+  <script src="lib/topojson.v1.min.js"></script>
+  <script src="app/js/main.js" ></script>
+  <script src="app/js/us-heat-map.js"></script>
+  <!--[if IE]><script type="text/javascript" src="app/js/excanvas.js"></script><![endif]-->
 
-    </div>
-    </div>
+  <script>
 
-    <!-- PAGE LEVEL SCRIPTS -->   
-    <script src="./lib/jquery-2.1.3.min.js"></script>
-    <script src="./lib/jquery-ui.min.js"></script>
-    <!--END PAGE LEVEL SCRIPTS -->
+    function toggleView(view) {
 
-    <script src="./lib/d3.min.js"></script>
-    <script src="./lib/topojson.v1.min.js"></script>
-    <script src="./app/js/main.js" ></script>
-    <script src="./app/js/us-heat-map.js"></script>
-    <script src="./data/st.data.js"></script>
-    <!--[if IE]><script type="text/javascript" src="../app/js/excanvas.js"></script><![endif]-->
-    <script>
-    function toggleView(event) {
-        var select = document.getElementById('countView');
-        var view = select.options[select.selectedIndex].id;
-        if (view === 'dailyCount') {
-            // $('.inner').css('background-color', '#000');
+        $('#totCountLabel').toggleClass("active");
+        $('#hrlCountLabel').toggleClass("active");
+        if (view == 'dailyCount') {
             renderCount(true);
 
             if(changeDuration){
@@ -150,23 +146,20 @@
               $('#play-btn').text('Play');
             }
         } else {
-            // GRAPHZ.util.refreshClock(0)
-            $('#hourly-count-view').prop('selectedIndex',0);
             renderCount(false);
         }
     }
     
     window.onload = function(){
-    		    renderCount(true);
+    		renderCount(true);
+        colorizeLegend();
     };
 
     function renderCount(daily) {
         if (daily) {
-            // toggleNode(document.getElementById('dailyCountView'), true);
             toggleNode(document.getElementById('hourlyCountView'), false);
             GRAPHZ.start('does-not-matter', true);
         } else {
-            // toggleNode(document.getElementById('dailyCountView'), false);
             toggleNode(document.getElementById('hourlyCountView'), true);
             GRAPHZ.start('does-not-matter');
         }
@@ -175,12 +168,27 @@
     function toggleNode(node, display) {
         node.style.display = (display)? 'block':'none';
     }
-    </script>
 
-    <!-- GLOBAL SCRIPTS -->
-     <script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/plugins/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    <!-- END GLOBAL SCRIPTS -->
+    function colorizeLegend(){
+      //TODO - copied the variable declaration from object declaration in us-heat-map.js file. 
+      // would be best to use same variable by exposing it properly. 
+      var pallete_arr = [
+            [255,255,229],
+            [247,252,185],
+            [217,240,163],
+            [173,221,142],
+            [120,198,121],
+            [65,171,93],
+            [35,132,67],
+            [0,104,55],
+            [0,69,41]
+          ]
+      var nodes = $('.key');
+      for (var i = 0; i <nodes.length; i++)
+        nodes[i].style.borderTopColor = 'rgb(' + pallete_arr[i].join() +')';
+    }
+
+  </script>
+
 </body>
-
 </html>
