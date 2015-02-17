@@ -8,8 +8,11 @@ var GRAPHZ =  GRAPHZ || {},
     var minHr = 0;
     var maxHr = 23;
     var dataSetToRender;
-    var value = minHr;
+    var tick_value = minHr;
     var play = false;
+
+    var isDaily = true;
+    var isSortByName = true;
 
     var heatMapOptions = {
                 'width': '100%',
@@ -36,31 +39,93 @@ var GRAPHZ =  GRAPHZ || {},
     GRAPHZ.start = function (dataURL, daily) {
         var dataSet = clickData;
     	var proxyDataURL = dataURL;
-        value = minHr;
+        isDaily = daily;
 
         if(!heatMap){
             heatMap = new GRAPHZ.USHeatMap('graph-container');
         }
 
         if (daily) {
-            renderData(aggregate(dataSet), minHr)
+            dataSetToRender = aggregate(dataSet)
+            renderData(dataSetToRender, minHr)
         } else {
         	dataSetToRender = transform(dataSet);
-            renderHourlyMap(dataSetToRender, value)
+            renderHourlyMap(dataSetToRender, tick_value)
         }
 
     };
 
+    var createSortByName = function(dataSet){
+        var data_to_object_arr = [];
+        for(var i in state_list){ 
+            var key = state_list[i]
+            if( key in dataSet){
+                state_name = reverse_stateCodeMap[key]
+                value = dataSet[key]
+                data_to_object_arr.push({'name': state_name, 'value': value})
+            }   
+        }
+        return data_to_object_arr;
+    }
+
+    var createSortByCount = function(dataSet){
+        var data_to_object_arr = createSortByName(dataSet);
+
+        data_to_object_arr.sort(function(d1, d2){
+            var keyA = d1.value;
+            var keyB = d2.value;
+            if(keyA > keyB) return -1;
+            if(keyA < keyB) return 1;
+            return 0;
+        });
+        return data_to_object_arr;
+    }
+
+    var sort_it = function(sorting_func){
+        var data_to_object_arr;
+        if (isDaily) {
+            data_to_object_arr = sorting_func(dataSetToRender.values)
+        } else {
+            data_to_object_arr = sorting_func(dataSetToRender[tick_value - minHr].values)
+        }
+        update_state_list(data_to_object_arr);
+    }
+
+    GRAPHZ.sort_by_name = function(){
+        sort_it(createSortByName);
+        isSortByName = true;
+    };
+
+    GRAPHZ.sort_by_count = function(){
+        sort_it(createSortByCount);
+        isSortByName = false;
+    };
+
     function renderData(dataSet, value){
-        update_state_list(dataSet.values)
+        var data_to_object_arr;
+
+        if(isSortByName){
+            data_to_object_arr = createSortByName(dataSet.values)
+        }else{
+            data_to_object_arr = createSortByCount(dataSet.values)
+        }
+
+        update_state_list(data_to_object_arr)
         heatMap.render(dataSet)
     }
 
     function renderHourlyMap(dataSet, value){
-      heatMap.render(dataSet[value - minHr]);
-      update_state_list(dataSet[value - minHr].values);
-      $('#hour').text(value + ":00");
-      d3.select('#hourly-count-view')[0][0].selectedIndex = value;
+        heatMap.render(dataSet[value - minHr]);
+        var data_to_object_arr;
+
+        if(isSortByName){
+            data_to_object_arr = createSortByName(dataSet[value - minHr].values)
+        }else{
+            data_to_object_arr = createSortByCount(dataSet[value - minHr].values)
+        }
+        update_state_list(data_to_object_arr);
+        $('#hour').text(value + ":00");
+        d3.select('#hourly-count-view')[0][0].selectedIndex = value;
    }
 
 
@@ -74,12 +139,12 @@ var GRAPHZ =  GRAPHZ || {},
             } else{
                 $('span', this).addClass("glyphicon-pause").removeClass("glyphicon-play");
                 changeDuration = window.setInterval(function(){
-                    if(value == maxHr){
-                        value = minHr;
+                    if(tick_value == maxHr){
+                        tick_value = minHr;
                     } else {
-                        value++;
+                        tick_value++;
                     }
-                renderHourlyMap(dataSetToRender, value);
+                renderHourlyMap(dataSetToRender, tick_value);
                     return play;
                 }, 1000);
 
@@ -95,6 +160,7 @@ var GRAPHZ =  GRAPHZ || {},
       // change the value for time representation
       $('#hour').text(--currentHour + ":00");
       d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
+      tick_value = currentHour;
       
       renderHourlyMap(dataSetToRender, currentHour);
     });
@@ -109,7 +175,7 @@ var GRAPHZ =  GRAPHZ || {},
           // change the value for time representation
           $('#hour').text(++currentHour + ":00");
           d3.select('#hourly-count-view')[0][0].selectedIndex == currentHour;
-          
+          tick_value = currentHour;
           renderHourlyMap(dataSetToRender, currentHour);
         });
 
@@ -122,8 +188,6 @@ var GRAPHZ =  GRAPHZ || {},
                 heatMap.resizeMap();
         }
     );
-
-        
 
 
     $('#toggle-btn').on('click', function(){
@@ -237,7 +301,6 @@ var GRAPHZ =  GRAPHZ || {},
             currMax = Math.max(currMax, (transformedDataPoint.values[i] || 0));
         }
         transformedDataPoint.scale.max = currMax;
-        update_state_list(transformedDataPoint.values)
         return transformedDataPoint;
     }
 
@@ -283,29 +346,51 @@ var GRAPHZ =  GRAPHZ || {},
 
     function k_format(number){
         var k_number = parseInt(number)
-        k_number = Math.ceil(k_number/1000)
-        return k_number + 'k'
+        k_number = Math.ceil(k_number/1)
+        //return k_number + 'k'
+        return k_number.toLocaleString();
     }
 
-    function update_state_list(data){
-        $('#state-data').empty();
-        $('#totalVisits').empty();
+    function update_state_list(data_to_object_arr){
 
-        var html = '', total=0, slno=1;
-        for(var i in state_list){ 
+        var min = d3.min(data_to_object_arr, function(d){return d.value })
+        var max = d3.max(data_to_object_arr, function(d){return d.value })
+        var total = d3.sum(data_to_object_arr, function(d){return d.value })
 
-            var key = state_list[i]
-            if( key in data){
-                html += '<li class=\"list-group-item\"><span>' + slno++ + '.</span><span class=\"text-capitalize\">' + reverse_stateCodeMap[key] + '</span><span>' + k_format(data[key]) + '  </span></li>';
-                total+= data[key];
-            }          
-            
+        var all_div = d3.select("#state-data").selectAll("div")
+        if(all_div[0].length > 1){
+
+            // var progress_bar_div = all_div.selectAll("div").data(data_to_object_arr)
+
+            d3.select("#state-data").selectAll('.progress-bar').data(data_to_object_arr)
+            // .attr('class', 'progress-bar text-capitalize')
+            .style("width", function(d) { return Math.ceil((d.value-min)/(max-min)*100) + "%"; })
+
+            d3.select("#state-data").selectAll('.namec').data(data_to_object_arr).text(function(d, i){return i+1 +'. '+ d.name })
+            d3.select("#state-data").selectAll('.countc').data(data_to_object_arr).text(function(d,i){return ' '+ k_format(d.value) })
+
+        }else{
+            var progress_div = all_div
+            .data(data_to_object_arr)
+            .enter().append("div").attr('class', 'progress')
+
+            var progress_bar_div = progress_div.append("div").attr('class', 'progress-bar text-capitalize')
+            .style("background-color", function(d) { return '#78C679' ; })
+            .style("width", function(d) { return Math.ceil((d.value-min)/(max-min)*100) + "%"; })
+
+            progress_bar_div.append('span').text(function(d, i){return i+1 +'. '+ d.name })
+            .attr('class', 'pdl10 namec');
+            progress_bar_div.append('span').text(function(d,i){return ' '+ k_format(d.value) })
+                .style('margin-left', '5px')
+                .attr('class', 'countc');
         }
-        // set the total number of visits
-        $('#totalVisits').text(total.toLocaleString());
+        
+        
+        
 
-        // append the HTML generated to 
-        $('#state-data').append('<ul class=\"list-group\">' + html + '</ul>');
+        
+        // // set the total number of visits
+        $('#totalVisits').text(total.toLocaleString());
 
     }
 })(window);

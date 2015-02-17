@@ -1,8 +1,14 @@
 /*global d3, GRAPHZ, topojson*/
 (function () {
-    var generate_pallette =  function(){
+    
+    var options;
+    var defaults = {
+        'width': '850',
+        'height': '500',
+        'scale': 850
+    };
 
-        var pallete_arr = [
+    var color_pallette = [
             [255,255,229],
             [247,252,185],
             [217,240,163],
@@ -14,16 +20,15 @@
             [0,69,41]
         ]
 
-        return pallete_arr
+    var get_rgb = function(value, min, max){
+        if(value == undefined){
+            return '0,0,0'
+        }
+        var ratio = (Math.log(value)/Math.log(max-min))*9
+        var index = Math.max(0, Math.floor(ratio)-1)
+        return color_pallette[index].join()
     }
-    
-    var color_pallette = generate_pallette()
-    var options;
-    var defaults = {
-        'width': '850',
-        'height': '500',
-        'scale': 850
-    };
+
     var getLegends = function (scale) {
         // var legends = [],
         //     red = 0,
@@ -102,7 +107,7 @@
         renderLegends(self.svg.selectAll('g'), legends, legendOffset);
     };
 
-    var renderDataq = function (usMapInfo, data, legendOffset) {
+    var reRender = function (usMapInfo, data, legendOffset) {
         var self = this,
             legends = getLegends(data.scale),
             us = usMapInfo;
@@ -136,15 +141,6 @@
         });
         renderLegends(self.svg.selectAll('g'), legends, legendOffset);
     };
-
-    var get_rgb = function(value, min, max){
-        if(value == undefined){
-            return '0,0,0'
-        }
-        var ratio = (Math.log(value)/Math.log(max-min))*9
-        var index = Math.max(0, Math.floor(ratio)-1)
-        return color_pallette[index].join()
-    }
 
     var showStateHoverPopup = function(at, state, value){
     	var self = this;
@@ -197,7 +193,7 @@
             });
         } else {
             if(this.svg.selectAll('g').node()){
-                renderDataq.call(this, this.usMapInfo, data, legendOffset);
+                reRender.call(this, this.usMapInfo, data, legendOffset);
             }else{
                 this.svg.selectAll('g').remove();
                 renderData.call(this, this.usMapInfo, data, legendOffset);

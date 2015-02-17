@@ -115,8 +115,16 @@
           <h3><span id="totalVisits"></span> &nbsp; Visits</h3>
         </div>
         <div><h6 class="text-uppercase">Alphabetically sorted by State</h6></div>
-        <div id="state-data">
 
+        <div class="sort-bar">
+          <ul >
+            <li><b>Sort by</b></li>
+            <li id="totCountLabel1" class="active"><a href="#" onclick="toggleSort(true)">Name</a></li>
+            <li id="hrlCountLabel1"><a href="#" onclick="toggleSort(false)">Count</a></li>
+          </ul>
+        </div>
+
+        <div id="state-data" >
         </div>
       </div>
     </div>
@@ -148,6 +156,16 @@
         } else {
             renderCount(false);
         }
+    }
+
+    function toggleSort(isName){
+      $('#totCountLabel1').toggleClass("active");
+      $('#hrlCountLabel1').toggleClass("active");
+      if(isName){
+        GRAPHZ.sort_by_name();
+      }else{
+        GRAPHZ.sort_by_count();
+      }
     }
     
     window.onload = function(){

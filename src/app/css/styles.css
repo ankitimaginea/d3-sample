@@ -80,4 +80,54 @@ li.key {
     padding-right: 0;
 }
 
-
+#state-data div {
+  font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  margin-bottom: 4px;
+  padding-top: 1px;
+  color: #5F4815;
+  line-height: 24px;
+  height: 28px;
+  margin-left: 0px;
+  border-radius: 0px 2px 2px 0px/ 2px 2px;
+  /*box-shadow: 6px 2px 2px #aaa;*/
+  background-color: #FFFEF7;
+  clear: both;
+}
+.progress-bar{
+  white-space:nowrap;
+  text-align: left;
+  box-shadow: none !important;
+  /*border-right: 1px solid #0C570D;*/
+}
+.pdl10{
+  padding-left: 10px;
+  float: left;
+}
+.sort-bar{
+  clear: both;
+  height: 30px;
+}
+.sort-bar ul{
+  list-style-type: none;
+  height: 100%;
+  padding-left: 10px;
+}
+.sort-bar li{
+  display: inline;
+  float: left;
+  margin: 0 10px 10px 0px;
+  line-height: 28px;
+  color: #101010;
+}
+.sort-bar li>a{
+  text-decoration: none;
+  height: 100%;
+  display: block;
+  line-height: 28px;
+  padding: 0 5px 0 3px;
+  color: #aaa;
+}
+.sort-bar .active>a{
+  color: #fb3c2d;
+  border-bottom: 1px solid #fb3c2d;
+}
