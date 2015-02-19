@@ -114,13 +114,13 @@
           <h5>UNITED STATES OF AMERICA</h5>
           <h3><span id="totalVisits"></span> &nbsp; Visits</h3>
         </div>
-        <div><h6 class="text-uppercase">Alphabetically sorted by State</h6></div>
+        <div><h6 id="sorting-label" class="text-uppercase">Alphabetically sorted by State</h6></div>
 
         <div class="sort-bar">
           <ul >
             <li><b>Sort by</b></li>
-            <li id="totCountLabel1" class="active"><a href="#" onclick="toggleSort(true)">Name</a></li>
-            <li id="hrlCountLabel1"><a href="#" onclick="toggleSort(false)">Count</a></li>
+            <li id="totCountLabel1" asc='true' class="active"><a href="#" onclick="toggleSort(true)">Name</a></li>
+            <li id="hrlCountLabel1" asc='true'><a href="#" onclick="toggleSort(false)">Count</a></li>
           </ul>
         </div>
 
@@ -159,12 +159,28 @@
     }
 
     function toggleSort(isName){
-      $('#totCountLabel1').toggleClass("active");
-      $('#hrlCountLabel1').toggleClass("active");
       if(isName){
+        var asc = ( $('#totCountLabel1').attr('asc') == 'true');
+        $('#sorting-label').text('Alphabetically sorted by State')
+        $('#hrlCountLabel1').attr('asc', false);
+        $('#totCountLabel1').attr('asc', !asc);
         GRAPHZ.sort_by_name();
+
+        if(!$('#totCountLabel1').hasClass('active')){
+          $('#totCountLabel1').toggleClass("active");
+          $('#hrlCountLabel1').toggleClass("active");
+        }
       }else{
+        var asc = ($('#hrlCountLabel1').attr('asc') == 'true');
+        $('#sorting-label').text('Visit countwise sorted by State')
+        $('#totCountLabel1').attr('asc', false);
+        $('#hrlCountLabel1').attr('asc', !asc);
         GRAPHZ.sort_by_count();
+
+        if(!$('#hrlCountLabel1').hasClass('active')){
+          $('#totCountLabel1').toggleClass("active");
+          $('#hrlCountLabel1').toggleClass("active");
+        }
       }
     }
     

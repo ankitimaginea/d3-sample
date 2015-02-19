@@ -56,9 +56,14 @@ var GRAPHZ =  GRAPHZ || {},
     };
 
     var createSortByName = function(dataSet){
+        var asc = ( $('#totCountLabel1').attr('asc') == 'true');
         var data_to_object_arr = [];
-        for(var i in state_list){ 
-            var key = state_list[i]
+        var comp_list = state_list;
+        if(!asc){
+            comp_list = rev_state_list;
+        }
+        for(var i in comp_list){ 
+            var key = comp_list[i]
             if( key in dataSet){
                 state_name = reverse_stateCodeMap[key]
                 value = dataSet[key]
@@ -68,16 +73,18 @@ var GRAPHZ =  GRAPHZ || {},
         return data_to_object_arr;
     }
 
-    var createSortByCount = function(dataSet){
-        var data_to_object_arr = createSortByName(dataSet);
+    function countAsc(d1, d2){
+        return d2.value - d1.value;
+    }
+    function countDesc(d1, d2){
+        return d1.value - d2.value;
+    }
 
-        data_to_object_arr.sort(function(d1, d2){
-            var keyA = d1.value;
-            var keyB = d2.value;
-            if(keyA > keyB) return -1;
-            if(keyA < keyB) return 1;
-            return 0;
-        });
+    var createSortByCount = function(dataSet){
+        var asc = ($('#hrlCountLabel1').attr('asc') == 'true');
+        var data_to_object_arr = createSortByName(dataSet);
+        var sort_func = asc ? countAsc: countDesc;
+        data_to_object_arr.sort(sort_func);
         return data_to_object_arr;
     }
 
@@ -91,12 +98,12 @@ var GRAPHZ =  GRAPHZ || {},
         update_state_list(data_to_object_arr);
     }
 
-    GRAPHZ.sort_by_name = function(){
+    GRAPHZ.sort_by_name = function(asc){
         sort_it(createSortByName);
         isSortByName = true;
     };
 
-    GRAPHZ.sort_by_count = function(){
+    GRAPHZ.sort_by_count = function(asc){
         sort_it(createSortByCount);
         isSortByName = false;
     };
@@ -275,11 +282,22 @@ var GRAPHZ =  GRAPHZ || {},
             state_list.push(data_map[i])
         }
         return [rev_data_map, state_list]
-
     }
-    var processed_data = get_reverse_code(stateCodeMap)
-    var reverse_stateCodeMap = processed_data[0] 
-    var state_list = processed_data[1] 
+
+    function reverse(a) {
+        var result = [];
+        var len = a.length;
+        while(len){
+            len--;
+            result.push(a[len]);
+        }
+        return result;
+    }
+
+    var processed_data = get_reverse_code(stateCodeMap);
+    var reverse_stateCodeMap = processed_data[0]; 
+    var state_list = processed_data[1];
+    var rev_state_list = reverse(state_list);
 
     function aggregate(dataSet) {
         var currMax = 0;
@@ -351,6 +369,11 @@ var GRAPHZ =  GRAPHZ || {},
         return k_number.toLocaleString();
     }
 
+    function get_width(d, min, max){
+        var width =  ( 1 + (d.value-min)/(max-min)*100 ).toFixed(2) ; 
+        return  width + "%";
+    }
+
     function update_state_list(data_to_object_arr){
 
         var min = d3.min(data_to_object_arr, function(d){return d.value })
@@ -364,7 +387,7 @@ var GRAPHZ =  GRAPHZ || {},
 
             d3.select("#state-data").selectAll('.progress-bar').data(data_to_object_arr)
             // .attr('class', 'progress-bar text-capitalize')
-            .style("width", function(d) { return Math.ceil((d.value-min)/(max-min)*100) + "%"; })
+            .style("width", function(d) { return get_width(d, min, max); })
 
             d3.select("#state-data").selectAll('.namec').data(data_to_object_arr).text(function(d, i){return i+1 +'. '+ d.name })
             d3.select("#state-data").selectAll('.countc').data(data_to_object_arr).text(function(d,i){return ' '+ k_format(d.value) })
@@ -376,7 +399,7 @@ var GRAPHZ =  GRAPHZ || {},
 
             var progress_bar_div = progress_div.append("div").attr('class', 'progress-bar text-capitalize')
             .style("background-color", function(d) { return '#78C679' ; })
-            .style("width", function(d) { return Math.ceil((d.value-min)/(max-min)*100) + "%"; })
+            .style("width", function(d) { return get_width(d, min, max); })
 
             progress_bar_div.append('span').text(function(d, i){return i+1 +'. '+ d.name })
             .attr('class', 'pdl10 namec');
