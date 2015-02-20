@@ -113,13 +113,35 @@ li.key {
   padding-left: 10px;
 }
 .sort-bar li{
+  float:left;
+}
+.sort-bar li>div{
+  margin-left: 15px;
+  cursor: pointer;
+  color: #968B8B;
+}
+.sort-bar li>div>label{
+  font-weight: inherit;
+  cursor: pointer;
+}
+.sort-bar .active>div{
+  color: #fb3c2d;
+}
+.sort-bar .active>div>label{
+  border-bottom: 1px solid #fb3c2d;
+}
+.sort-bar .active .glyphicon{
+  top: 2px;
+}
+
+/*.sort-bar li>div>label{
   display: inline;
   float: left;
   margin: 0 10px 10px 0px;
   line-height: 28px;
   color: #101010;
 }
-.sort-bar li>a{
+.sort-bar li>div{
   text-decoration: none;
   height: 100%;
   display: block;
@@ -131,3 +153,4 @@ li.key {
   color: #fb3c2d;
   border-bottom: 1px solid #fb3c2d;
 }
+*/

@@ -118,9 +118,21 @@
 
         <div class="sort-bar">
           <ul >
-            <li><b>Sort by</b></li>
-            <li id="totCountLabel1" asc='true' class="active"><a href="#" onclick="toggleSort(true)">Name</a></li>
-            <li id="hrlCountLabel1" asc='true'><a href="#" onclick="toggleSort(false)">Count</a></li>
+            <li><label style="font-weight:inherit">Sort by: </label></li>
+            <li id="totCountLabel1" asc='true' class="active" onclick="toggleSort(true)">
+              <!-- <a href="#" onclick="toggleSort(true)">Name</a> -->
+              <div >
+                <label>Name</label>
+                <div id="alpha-sort" class="glyphicon glyphicon-triangle-top"></div>
+              </div>
+            </li>
+            <li id="hrlCountLabel1" asc='true' onclick="toggleSort(false)">
+              <!-- <a href="#" onclick="toggleSort(false)">Count</a> -->
+              <div>
+                <label>Count</label>
+                <div id="count-sort" class="glyphicon glyphicon-triangle-bottom"></div>
+              </div>
+            </li>
           </ul>
         </div>
 
@@ -158,12 +170,33 @@
         }
     }
 
+    function change_glyph_icon(elm_id, asc){
+      if(asc){
+        $('#'+elm_id).removeClass('glyphicon-triangle-bottom');
+        $('#'+elm_id).addClass('glyphicon-triangle-top');
+      }else{
+        $('#'+elm_id).addClass('glyphicon-triangle-bottom');
+        $('#'+elm_id).removeClass('glyphicon-triangle-top');
+      }
+    }
+
+    function swap_alpha_class(asc){
+      change_glyph_icon('alpha-sort', !asc);
+      $('#hrlCountLabel1').attr('asc', false);
+      $('#totCountLabel1').attr('asc', !asc);
+    }
+
+    function sort_count_class(asc){
+      change_glyph_icon('count-sort', asc);
+      $('#totCountLabel1').attr('asc', false);
+      $('#hrlCountLabel1').attr('asc', !asc);
+    }
+
     function toggleSort(isName){
       if(isName){
         var asc = ( $('#totCountLabel1').attr('asc') == 'true');
         $('#sorting-label').text('Alphabetically sorted by State')
-        $('#hrlCountLabel1').attr('asc', false);
-        $('#totCountLabel1').attr('asc', !asc);
+        swap_alpha_class(asc)
         GRAPHZ.sort_by_name();
 
         if(!$('#totCountLabel1').hasClass('active')){
@@ -173,8 +206,7 @@
       }else{
         var asc = ($('#hrlCountLabel1').attr('asc') == 'true');
         $('#sorting-label').text('Visit countwise sorted by State')
-        $('#totCountLabel1').attr('asc', false);
-        $('#hrlCountLabel1').attr('asc', !asc);
+        sort_count_class(asc)
         GRAPHZ.sort_by_count();
 
         if(!$('#hrlCountLabel1').hasClass('active')){
